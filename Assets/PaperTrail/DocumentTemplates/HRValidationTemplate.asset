@@ -1,0 +1,100 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08760ad3418694768bbe68fb22c33f73, type: 3}
+  m_Name: HRValidationTemplate
+  m_EditorClassIdentifier: 
+  documentTitle: HR Validation Form
+  documentType: 3
+  description: HR validation for doctor selection
+  documentIcon: {fileID: 0}
+  formFields:
+  - fieldName: HR Officer Name
+    fieldType: 0
+    isRequired: 1
+    placeholder: Responsible HR officer
+    dropdownOptions: []
+    validationRule: 
+    maxLength: 0
+    triggersNewDocument: 0
+    triggerDocumentType: 
+    rejectionReason: 
+  - fieldName: Validation Date
+    fieldType: 2
+    isRequired: 1
+    placeholder: 
+    dropdownOptions: []
+    validationRule: 
+    maxLength: 0
+    triggersNewDocument: 0
+    triggerDocumentType: 
+    rejectionReason: 
+  - fieldName: Doctor Validation Status
+    fieldType: 3
+    isRequired: 1
+    placeholder: 
+    dropdownOptions:
+    - Approved with conditions
+    - Conditionally approved
+    - Approved pending further validation
+    - Temporarily approved subject to review
+    validationRule: 
+    maxLength: 0
+    triggersNewDocument: 0
+    triggerDocumentType: 
+    rejectionReason: 
+  - fieldName: Additional Comments
+    fieldType: 5
+    isRequired: 0
+    placeholder: Any additional observations
+    dropdownOptions: []
+    validationRule: 
+    maxLength: 0
+    triggersNewDocument: 0
+    triggerDocumentType: 
+    rejectionReason: 
+  - fieldName: Requires Director Approval
+    fieldType: 4
+    isRequired: 0
+    placeholder: 
+    dropdownOptions: []
+    validationRule: 
+    maxLength: 0
+    triggersNewDocument: 0
+    triggerDocumentType: 
+    rejectionReason: 
+  requiresStamp: 1
+  requiresSignature: 1
+  baseBureaucracyLevel: 4
+  processingTimeMinutes: 5
+  triggers:
+  - triggerName: Director Approval Required
+    condition: 1
+    conditionValue: true
+    probability: 0.3
+    newDocumentTypes:
+    - VacationRequest
+    bureaucracyScoreBonus: 200
+    triggerMessage: "Le directeur exige maintenant une nouvelle demande de cong\xE9
+      avec justification suppl\xE9mentaire!"
+    canTriggerRecursively: 1
+    maxCascadeDepth: 10
+  frenchTitle: Formulaire de Validation RH
+  frenchDescription: "Validation des Ressources Humaines pour la s\xE9lection du
+    m\xE9decin"
+  frenchFieldNames:
+  - Nom de l'agent RH
+  - Date de validation
+  - "Statut de validation du m\xE9decin"
+  - "Commentaires suppl\xE9mentaires"
+  - "N\xE9cessite l'approbation du directeur"
+  possibleRejections: []
+  rejectionProbability: 0.1

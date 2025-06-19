@@ -1,0 +1,100 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08760ad3418694768bbe68fb22c33f73, type: 3}
+  m_Name: VacationRequestTemplate
+  m_EditorClassIdentifier: 
+  documentTitle: Vacation Request Form
+  documentType: 0
+  description: Standard vacation request form
+  documentIcon: {fileID: 0}
+  formFields:
+  - fieldName: Employee Name
+    fieldType: 0
+    isRequired: 1
+    placeholder: Full name
+    dropdownOptions: []
+    validationRule: 
+    maxLength: 0
+    triggersNewDocument: 0
+    triggerDocumentType: 
+    rejectionReason: 
+  - fieldName: Start Date
+    fieldType: 2
+    isRequired: 1
+    placeholder: DD/MM/YYYY
+    dropdownOptions: []
+    validationRule: 
+    maxLength: 0
+    triggersNewDocument: 0
+    triggerDocumentType: 
+    rejectionReason: 
+  - fieldName: End Date
+    fieldType: 2
+    isRequired: 1
+    placeholder: DD/MM/YYYY
+    dropdownOptions: []
+    validationRule: 
+    maxLength: 0
+    triggersNewDocument: 0
+    triggerDocumentType: 
+    rejectionReason: 
+  - fieldName: Reason
+    fieldType: 5
+    isRequired: 1
+    placeholder: Reason for vacation
+    dropdownOptions: []
+    validationRule: 
+    maxLength: 0
+    triggersNewDocument: 0
+    triggerDocumentType: 
+    rejectionReason: 
+  - fieldName: Duration
+    fieldType: 3
+    isRequired: 1
+    placeholder: 
+    dropdownOptions:
+    - 1 day
+    - 2 days
+    - 3 days
+    - 1 week
+    - 2 weeks
+    validationRule: 
+    maxLength: 0
+    triggersNewDocument: 0
+    triggerDocumentType: 
+    rejectionReason: 
+  requiresStamp: 1
+  requiresSignature: 0
+  baseBureaucracyLevel: 1
+  processingTimeMinutes: 5
+  triggers:
+  - triggerName: Medical Certificate Required
+    condition: 0
+    conditionValue: 
+    probability: 1
+    newDocumentTypes:
+    - MedicalCertificateRequest
+    bureaucracyScoreBonus: 50
+    triggerMessage: "Attention! Les cong\xE9s de plus de 2 jours n\xE9cessitent un
+      certificat m\xE9dical!"
+    canTriggerRecursively: 1
+    maxCascadeDepth: 5
+  frenchTitle: "Demande de Cong\xE9s Pay\xE9s"
+  frenchDescription: "Formulaire standard de demande de cong\xE9s pay\xE9s"
+  frenchFieldNames:
+  - "Nom de l'employ\xE9"
+  - "Date de d\xE9but"
+  - Date de fin
+  - Motif
+  - "Dur\xE9e"
+  possibleRejections: []
+  rejectionProbability: 0.1

@@ -76,16 +76,36 @@ public static class CanvasGeneratorMain
         GameObject bureaucracySystemGO = new GameObject("BureaucracySystem");
         bureaucracySystemGO.AddComponent<BureaucracySystem>();
 
-        Debug.Log("System GameObjects created!");
-        Debug.Log("Remember to connect references:");
-        Debug.Log("- GameManager: documentManager, bureaucracySystem");
-        Debug.Log("- BureaucracySystem: documentManager");
+        // AJOUTER CETTE PARTIE:
+        // Create DynamicConfigurationManager
+        GameObject configManagerGO = new GameObject("DynamicConfigurationManager");
+        DynamicConfigurationManager configManager = configManagerGO.AddComponent<DynamicConfigurationManager>();
 
-        EditorUtility.DisplayDialog(
-            "System Objects Created",
-            "GameManager, DocumentManager, and BureaucracySystem created.\n\nCheck Console for reference instructions.",
-            "OK"
-        );
+        // Auto-assign references
+        GameManager gameManager = gameManagerGO.GetComponent<GameManager>();
+        DocumentManager documentManager = documentManagerGO.GetComponent<DocumentManager>();
+        BureaucracySystem bureaucracySystem = bureaucracySystemGO.GetComponent<BureaucracySystem>();
+
+        // Connect references
+        gameManager.documentManager = documentManager;
+        gameManager.bureaucracySystem = bureaucracySystem;
+        bureaucracySystem.documentManager = documentManager;
+
+        Debug.Log("System GameObjects created with DynamicConfigurationManager!");
+        Debug.Log("Don't forget to assign currentScenario and dataGenerator in the inspector!");
+    }
+
+    // Option B: Menu séparé pour créer juste le Configuration Manager
+    [MenuItem("Tools/Paper Trail/Create Configuration Manager")]
+    public static void CreateConfigurationManager()
+    {
+        GameObject configManagerGO = new GameObject("DynamicConfigurationManager");
+        DynamicConfigurationManager configManager = configManagerGO.AddComponent<DynamicConfigurationManager>();
+
+        Debug.Log("DynamicConfigurationManager created!");
+        Debug.Log("Assign a BureaucracyScenario and FrenchDataGenerator in the inspector.");
+
+        Selection.activeGameObject = configManagerGO;
     }
 
     [MenuItem("Tools/Paper Trail/Clear All Paper Trail Objects")]

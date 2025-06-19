@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
+using System.Linq;
 using System.Collections.Generic;
 
 [CustomEditor(typeof(FrenchDataGenerator))]

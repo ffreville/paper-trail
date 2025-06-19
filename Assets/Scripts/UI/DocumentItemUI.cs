@@ -19,30 +19,12 @@ public class DocumentItemUI : MonoBehaviour
 
     private DocumentData documentData;
     
-    // Support pour les deux types d'inbox (legacy et enhanced)
-    private InboxUI legacyInboxUI;
-    private EnhancedInboxUI enhancedInboxUI;
+    private InboxUI inboxUI;
 
-    // Setup method pour legacy InboxUI
     public void Setup(DocumentData document, InboxUI inbox)
     {
         documentData = document;
-        legacyInboxUI = inbox;
-        enhancedInboxUI = null;
-
-        Debug.Log($"Setting up DocumentItem (Legacy): {document.documentTitle}");
-        UpdateDisplay();
-        SetupButton();
-    }
-
-    // Setup method pour Enhanced InboxUI
-    public void Setup(DocumentData document, EnhancedInboxUI inbox)
-    {
-        documentData = document;
-        enhancedInboxUI = inbox;
-        legacyInboxUI = null;
-
-        Debug.Log($"Setting up DocumentItem (Enhanced): {document.documentTitle}");
+        inboxUI = inbox;
         UpdateDisplay();
         SetupButton();
     }
@@ -109,30 +91,13 @@ public class DocumentItemUI : MonoBehaviour
         }
 
         // Essaie d'abord avec Enhanced, puis avec Legacy
-        if (enhancedInboxUI != null)
+        if (inboxUI != null)
         {
-            Debug.Log($"Using Enhanced InboxUI for document: {documentData.documentTitle}");
-            enhancedInboxUI.SelectDocument(documentData);
-        }
-        else if (legacyInboxUI != null)
-        {
-            Debug.Log($"Using Legacy InboxUI for document: {documentData.documentTitle}");
-            legacyInboxUI.SelectDocument(documentData);
+            inboxUI.SelectDocument(documentData);
         }
         else
         {
-            Debug.LogError("No InboxUI reference available (neither Legacy nor Enhanced)!");
+            Debug.LogError("No InboxUI reference available !");
         }
-    }
-
-    // Méthode pour vérifier quel type d'inbox est utilisé
-    public bool IsUsingEnhancedUI()
-    {
-        return enhancedInboxUI != null;
-    }
-
-    public bool IsUsingLegacyUI()
-    {
-        return legacyInboxUI != null;
     }
 }

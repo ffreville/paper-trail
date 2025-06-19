@@ -1,0 +1,76 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08760ad3418694768bbe68fb22c33f73, type: 3}
+  m_Name: MedicalCertificateTemplate
+  m_EditorClassIdentifier: 
+  documentTitle: Medical Certificate Request
+  documentType: 1
+  description: Request for medical certificate
+  documentIcon: {fileID: 0}
+  formFields:
+  - fieldName: Patient Name
+    fieldType: 0
+    isRequired: 1
+    placeholder: 
+    dropdownOptions: []
+    validationRule: 
+    maxLength: 0
+    triggersNewDocument: 0
+    triggerDocumentType: 
+    rejectionReason: 
+  - fieldName: Requested Certificate Type
+    fieldType: 3
+    isRequired: 1
+    placeholder: 
+    dropdownOptions:
+    - Fitness for vacation
+    - Rest certificate
+    - Stress leave justification
+    validationRule: 
+    maxLength: 0
+    triggersNewDocument: 0
+    triggerDocumentType: 
+    rejectionReason: 
+  - fieldName: Duration of Rest
+    fieldType: 0
+    isRequired: 1
+    placeholder: Number of days
+    dropdownOptions: []
+    validationRule: 
+    maxLength: 0
+    triggersNewDocument: 0
+    triggerDocumentType: 
+    rejectionReason: 
+  requiresStamp: 1
+  requiresSignature: 1
+  baseBureaucracyLevel: 2
+  processingTimeMinutes: 5
+  triggers:
+  - triggerName: Approved Doctors List Required
+    condition: 0
+    conditionValue: 
+    probability: 1
+    newDocumentTypes:
+    - ApprovedDoctorsList
+    bureaucracyScoreBonus: 75
+    triggerMessage: "Le m\xE9decin doit \xEAtre choisi dans notre liste officielle
+      de praticiens agr\xE9\xE9s!"
+    canTriggerRecursively: 1
+    maxCascadeDepth: 5
+  frenchTitle: "Demande de Certificat M\xE9dical"
+  frenchDescription: "Demande de certificat m\xE9dical de complaisance"
+  frenchFieldNames:
+  - Nom du patient
+  - "Type de certificat demand\xE9"
+  - "Dur\xE9e du repos"
+  possibleRejections: []
+  rejectionProbability: 0.1

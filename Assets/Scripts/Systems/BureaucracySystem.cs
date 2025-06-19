@@ -1,147 +1,237 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 
+/// <summary>
+/// Gestionnaire des règles globales de bureaucratie
+/// La logique spécifique aux documents est maintenant dans DynamicConfigurationManager
+/// </summary>
 public class BureaucracySystem : MonoBehaviour
 {
-    [Header("Bureaucracy Rules")]
+    [Header("Global Bureaucracy Rules")]
     public int maxDocumentsBeforeAbandonment = 8;
     public float citizenPatienceTime = 120f; // 2 minutes in real time
+    public float systemOverloadThreshold = 15f; // Nombre de documents simultanés
+
+    [Header("System Effects")]
+    public bool enableSystemOverload = true;
+    public bool enableCitizenAbandonment = true;
 
     [Header("References")]
     public DocumentManager documentManager;
 
+    private DynamicConfigurationManager configManager;
     private Dictionary<string, CitizenRequest> activeCitizenRequests = new Dictionary<string, CitizenRequest>();
+    private Dictionary<string, float> citizenPatienceTimers = new Dictionary<string, float>();
 
-    public void ProcessDocument(DocumentData document)
+    private void Start()
     {
-        Debug.Log($"Processing bureaucracy for: {document.documentTitle}");
+        // Trouve les références automatiquement
+        if (documentManager == null)
+            documentManager = FindObjectOfType<DocumentManager>();
 
-        // Apply bureaucracy rules based on document type
-        switch (document.documentType)
+        configManager = FindObjectOfType<DynamicConfigurationManager>();
+
+        // Subscribe aux événements du système dynamique
+        if (configManager != null)
         {
-            case DocumentType.VacationRequest:
-                ProcessVacationRequest(document);
-                break;
-            case DocumentType.MedicalCertificateRequest:
-                ProcessMedicalCertificateRequest(document);
-                break;
-            case DocumentType.ApprovedDoctorsList:
-                ProcessApprovedDoctorsList(document);
-                break;
-            case DocumentType.HRValidationForm:
-                ProcessHRValidationForm(document);
-                break;
+            configManager.OnDynamicDocumentGenerated += OnDocumentGenerated;
+            configManager.OnTriggerActivated += OnTriggerActivated;
+        }
+
+        if (documentManager != null)
+        {
+            documentManager.OnDocumentProcessed += OnDocumentProcessed;
+        }
+
+        Debug.Log("BureaucracySystem initialized - Global rules only");
+    }
+
+    private void Update()
+    {
+        if (enableCitizenAbandonment)
+        {
+            UpdateCitizenPatience();
+        }
+
+        if (enableSystemOverload)
+        {
+            CheckSystemOverload();
         }
     }
 
-    private void ProcessVacationRequest(DocumentData document)
+    private void OnDocumentGenerated(DocumentData document)
     {
-        // Check if vacation is more than 2 days
-        string startDate = document.formFields.ContainsKey("Start Date") ? document.formFields["Start Date"] : "";
-        string endDate = document.formFields.ContainsKey("End Date") ? document.formFields["End Date"] : "";
+        // Démarre le timer de patience pour ce citoyen
+        StartCitizenPatienceTimer(document.citizenName);
 
-        // For prototype, assume it's always more than 2 days
-        Debug.Log("Vacation request is more than 2 days - Medical certificate required!");
-
-        // Generate medical certificate request
-        DocumentData medicalCertReq = CreateMedicalCertificateRequest(document);
-        documentManager.AddDocument(medicalCertReq);
-
-        // Update original document status
-        document.status = DocumentStatus.WaitingForAdditionalInfo;
-        document.requiredDocuments.Add("Medical Certificate");
-
-        GameManager.Instance.IncrementBureaucracyScore(25); // Bonus for creating cascade
+        Debug.Log($"Global Bureaucracy: Document generated for {document.citizenName}");
     }
 
-    private void ProcessMedicalCertificateRequest(DocumentData document)
+    private void OnTriggerActivated(BureaucracyTrigger trigger)
     {
-        Debug.Log("Medical certificate must be from approved doctor!");
+        // Effets globaux des triggers (pas de logique spécifique)
+        Debug.Log($"Global Bureaucracy: Trigger activated - {trigger.triggerName}");
 
-        // Generate approved doctors list
-        DocumentData doctorsList = CreateApprovedDoctorsList(document);
-        documentManager.AddDocument(doctorsList);
-
-        document.status = DocumentStatus.WaitingForAdditionalInfo;
-        document.requiredDocuments.Add("Choose from approved doctors list");
-
-        GameManager.Instance.IncrementBureaucracyScore(25);
+        // Peut réduire la patience globale quand les cascades s'activent
+        if (trigger.canTriggerRecursively)
+        {
+            ReduceGlobalPatience(0.1f);
+        }
     }
 
-    private void ProcessApprovedDoctorsList(DocumentData document)
+    private void OnDocumentProcessed(DocumentData document)
     {
-        Debug.Log("Doctor selection requires HR validation!");
+        // Arrête le timer de patience pour ce citoyen
+        StopCitizenPatienceTimer(document.citizenName);
 
-        // Generate HR validation form
-        DocumentData hrValidation = CreateHRValidationForm(document);
-        documentManager.AddDocument(hrValidation);
-
-        document.status = DocumentStatus.WaitingForAdditionalInfo;
-        document.requiredDocuments.Add("HR Validation Required");
-
-        GameManager.Instance.IncrementBureaucracyScore(30);
+        Debug.Log($"Global Bureaucracy: Document processed for {document.citizenName}");
     }
 
-    private void ProcessHRValidationForm(DocumentData document)
+    private void StartCitizenPatienceTimer(string citizenName)
     {
-        Debug.Log("HR Validation complete - Request can now be finalized!");
-
-        // This is the end of our prototype cascade
-        document.status = DocumentStatus.Completed;
-
-        GameManager.Instance.IncrementBureaucracyScore(50); // Big bonus for completion
-        GameManager.Instance.citizensServed++;
+        if (!citizenPatienceTimers.ContainsKey(citizenName))
+        {
+            citizenPatienceTimers[citizenName] = citizenPatienceTime;
+        }
     }
 
-    private DocumentData CreateMedicalCertificateRequest(DocumentData originalDoc)
+    private void StopCitizenPatienceTimer(string citizenName)
     {
-        DocumentData medicalReq = new DocumentData();
-        medicalReq.documentTitle = "Medical Certificate Request";
-        medicalReq.documentType = DocumentType.MedicalCertificateRequest;
-        medicalReq.citizenName = originalDoc.citizenName;
-        medicalReq.requestDetails = "Medical certificate required for vacation > 2 days";
-        medicalReq.bureaucracyLevel = 2;
-        medicalReq.requiresStamp = true;
-
-        medicalReq.formFields.Add("Patient Name", originalDoc.citizenName);
-        medicalReq.formFields.Add("Reason for Certificate", "Vacation justification");
-        medicalReq.formFields.Add("Duration", "");
-
-        return medicalReq;
+        if (citizenPatienceTimers.ContainsKey(citizenName))
+        {
+            citizenPatienceTimers.Remove(citizenName);
+        }
     }
 
-    private DocumentData CreateApprovedDoctorsList(DocumentData originalDoc)
+    private void UpdateCitizenPatience()
     {
-        DocumentData doctorsList = new DocumentData();
-        doctorsList.documentTitle = "Approved Doctors List";
-        doctorsList.documentType = DocumentType.ApprovedDoctorsList;
-        doctorsList.citizenName = originalDoc.citizenName;
-        doctorsList.requestDetails = "List of company-approved medical practitioners";
-        doctorsList.bureaucracyLevel = 3;
-        doctorsList.requiresStamp = false;
+        List<string> citizensToRemove = new List<string>();
 
-        doctorsList.formFields.Add("Selected Doctor", "");
-        doctorsList.formFields.Add("Doctor License Number", "");
-        doctorsList.formFields.Add("Appointment Date", "");
+        foreach (var kvp in citizenPatienceTimers)
+        {
+            string citizenName = kvp.Key;
+            float timeRemaining = kvp.Value;
 
-        return doctorsList;
+            timeRemaining -= Time.deltaTime;
+            citizenPatienceTimers[citizenName] = timeRemaining;
+
+            if (timeRemaining <= 0)
+            {
+                // Citoyen abandonné !
+                OnCitizenAbandoned(citizenName);
+                citizensToRemove.Add(citizenName);
+            }
+        }
+
+        // Supprime les citoyens qui ont abandonné
+        foreach (string citizenName in citizensToRemove)
+        {
+            citizenPatienceTimers.Remove(citizenName);
+        }
     }
 
-    private DocumentData CreateHRValidationForm(DocumentData originalDoc)
+    private void OnCitizenAbandoned(string citizenName)
     {
-        DocumentData hrValidation = new DocumentData();
-        hrValidation.documentTitle = "HR Validation Form";
-        hrValidation.documentType = DocumentType.HRValidationForm;
-        hrValidation.citizenName = originalDoc.citizenName;
-        hrValidation.requestDetails = "HR validation for approved doctor selection";
-        hrValidation.bureaucracyLevel = 4;
-        hrValidation.requiresStamp = true;
-        hrValidation.requiresSignature = true;
+        Debug.Log($"🚫 Citizen abandoned: {citizenName} (patience expired)");
 
-        hrValidation.formFields.Add("HR Officer", "");
-        hrValidation.formFields.Add("Validation Date", "");
-        hrValidation.formFields.Add("Comments", "");
+        // Incrémente le compteur d'abandons
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.citizensAbandoned++;
+        }
 
-        return hrValidation;
+        // Effet narratif
+        string abandonMessage = $"💔 {citizenName} has given up and left the office!\n";
+        abandonMessage += "The bureaucratic maze has claimed another victim...";
+
+        configManager?.OnNarrativeUpdate?.Invoke(abandonMessage);
+    }
+
+    private void CheckSystemOverload()
+    {
+        if (documentManager == null) return;
+
+        int currentDocuments = documentManager.GetInboxCount();
+
+        if (currentDocuments >= systemOverloadThreshold)
+        {
+            OnSystemOverloaded();
+        }
+    }
+
+    private void OnSystemOverloaded()
+    {
+        Debug.Log("🔥 SYSTEM OVERLOAD! Too many documents!");
+
+        // Réduit la patience de tous les citoyens
+        ReduceGlobalPatience(0.5f);
+
+        // Message d'alerte
+        string overloadMessage = "🚨 SYSTEM OVERLOAD! 🚨\n";
+        overloadMessage += "The bureaucratic machine is grinding to a halt!\n";
+        overloadMessage += "Citizens are getting increasingly impatient...";
+
+        configManager?.OnNarrativeUpdate?.Invoke(overloadMessage);
+    }
+
+    private void ReduceGlobalPatience(float reduction)
+    {
+        List<string> citizens = new List<string>(citizenPatienceTimers.Keys);
+
+        foreach (string citizen in citizens)
+        {
+            citizenPatienceTimers[citizen] -= reduction * citizenPatienceTime;
+            citizenPatienceTimers[citizen] = Mathf.Max(0, citizenPatienceTimers[citizen]);
+        }
+    }
+
+    // Méthodes utilitaires publiques
+    public int GetActiveCitizensCount()
+    {
+        return citizenPatienceTimers.Count;
+    }
+
+    public float GetAveragePatienceLevel()
+    {
+        if (citizenPatienceTimers.Count == 0) return 1f;
+
+        float totalPatience = 0f;
+        foreach (var patience in citizenPatienceTimers.Values)
+        {
+            totalPatience += patience / citizenPatienceTime; // Normalise entre 0-1
+        }
+
+        return totalPatience / citizenPatienceTimers.Count;
+    }
+
+    public bool IsSystemOverloaded()
+    {
+        return documentManager != null && documentManager.GetInboxCount() >= systemOverloadThreshold;
+    }
+
+    // Méthodes pour ajuster les règles en runtime
+    public void SetPatienceTime(float newTime)
+    {
+        citizenPatienceTime = newTime;
+        Debug.Log($"Citizen patience time set to {newTime} seconds");
+    }
+
+    public void SetOverloadThreshold(int newThreshold)
+    {
+        systemOverloadThreshold = newThreshold;
+        Debug.Log($"System overload threshold set to {newThreshold} documents");
+    }
+
+    // Debug info
+    private void OnGUI()
+    {
+        if (Application.isEditor && citizenPatienceTimers.Count > 0)
+        {
+            GUILayout.BeginArea(new Rect(10, 10, 300, 200));
+            GUILayout.Label($"Active Citizens: {GetActiveCitizensCount()}");
+            GUILayout.Label($"Average Patience: {GetAveragePatienceLevel():P0}");
+            GUILayout.Label($"System Overloaded: {IsSystemOverloaded()}");
+            GUILayout.EndArea();
+        }
     }
 }

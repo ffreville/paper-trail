@@ -1,0 +1,75 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08760ad3418694768bbe68fb22c33f73, type: 3}
+  m_Name: ApprovedDoctorsTemplate
+  m_EditorClassIdentifier: 
+  documentTitle: Approved Doctors Selection
+  documentType: 2
+  description: Selection from approved medical practitioners
+  documentIcon: {fileID: 0}
+  formFields:
+  - fieldName: Selected Doctor
+    fieldType: 3
+    isRequired: 1
+    placeholder: 
+    dropdownOptions:
+    - Dr. Dupont (en vacances)
+    - "Dr. Martin (en cong\xE9 maladie)"
+    - "Dr. Bernard (retrait\xE9 depuis 1987)"
+    validationRule: 
+    maxLength: 0
+    triggersNewDocument: 0
+    triggerDocumentType: 
+    rejectionReason: 
+  - fieldName: Doctor License Number
+    fieldType: 0
+    isRequired: 1
+    placeholder: License number
+    dropdownOptions: []
+    validationRule: 
+    maxLength: 0
+    triggersNewDocument: 0
+    triggerDocumentType: 
+    rejectionReason: 
+  - fieldName: Appointment Date
+    fieldType: 2
+    isRequired: 1
+    placeholder: 
+    dropdownOptions: []
+    validationRule: 
+    maxLength: 0
+    triggersNewDocument: 0
+    triggerDocumentType: 
+    rejectionReason: 
+  requiresStamp: 0
+  requiresSignature: 0
+  baseBureaucracyLevel: 3
+  processingTimeMinutes: 5
+  triggers:
+  - triggerName: HR Validation Required
+    condition: 0
+    conditionValue: 
+    probability: 1
+    newDocumentTypes:
+    - HRValidationForm
+    bureaucracyScoreBonus: 100
+    triggerMessage: "Les Ressources Humaines doivent valider votre choix de m\xE9decin!"
+    canTriggerRecursively: 0
+    maxCascadeDepth: 5
+  frenchTitle: "S\xE9lection de M\xE9decin Agr\xE9\xE9"
+  frenchDescription: "S\xE9lection parmi les praticiens m\xE9dicaux agr\xE9\xE9s"
+  frenchFieldNames:
+  - "M\xE9decin s\xE9lectionn\xE9"
+  - "Num\xE9ro de licence"
+  - Date de rendez-vous
+  possibleRejections: []
+  rejectionProbability: 0.1

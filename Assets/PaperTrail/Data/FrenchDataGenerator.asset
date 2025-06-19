@@ -1,0 +1,169 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db6772fe680fb489ea6db594f343e9a2, type: 3}
+  m_Name: FrenchDataGenerator
+  m_EditorClassIdentifier: 
+  frenchFirstNames:
+  - Pierre
+  - Marie
+  - Jean
+  - "Fran\xE7oise"
+  - Michel
+  - Monique
+  - Alain
+  - Catherine
+  - Philippe
+  - Nathalie
+  - Bernard
+  - Isabelle
+  - Christophe
+  - Sylvie
+  - Daniel
+  - Chantal
+  - Patrice
+  - Martine
+  - "Fran\xE7ois"
+  - Nicole
+  - "G\xE9rard"
+  - Brigitte
+  - Antoine
+  - "H\xE9l\xE8ne"
+  - Laurent
+  - "Val\xE9rie"
+  - Thierry
+  - Dominique
+  - Pascal
+  - "V\xE9ronique"
+  - Bruno
+  - Sandrine
+  frenchLastNames:
+  - Martin
+  - Bernard
+  - Dubois
+  - Thomas
+  - Robert
+  - Richard
+  - Petit
+  - Durand
+  - Leroy
+  - Moreau
+  - Simon
+  - Laurent
+  - Lefebvre
+  - Michel
+  - Garcia
+  - David
+  - Bertrand
+  - Roux
+  - Vincent
+  - Fournier
+  - Morel
+  - Girard
+  - Andre
+  - Lefevre
+  - Mercier
+  - Dupont
+  - Lambert
+  - Bonnet
+  - "Fran\xE7ois"
+  - Martinez
+  - Legrand
+  - Garnier
+  frenchCities:
+  - Paris
+  - Marseille
+  - Lyon
+  - Toulouse
+  - Nice
+  - Nantes
+  - Strasbourg
+  - Montpellier
+  - Bordeaux
+  - Lille
+  - Rennes
+  - Reims
+  - Le Havre
+  - "Saint-\xC9tienne"
+  - Toulon
+  - Grenoble
+  - Dijon
+  - Angers
+  - "N\xEEmes"
+  - Villeurbanne
+  - Le Mans
+  - Aix-en-Provence
+  - Clermont-Ferrand
+  - Brest
+  - Tours
+  - Limoges
+  - Amiens
+  - Perpignan
+  - Metz
+  - "Besan\xE7on"
+  - "Orl\xE9ans"
+  frenchStreets:
+  - "Rue de la R\xE9publique"
+  - "Avenue Jean Jaur\xE8s"
+  - Place de la Mairie
+  - Rue Victor Hugo
+  - Boulevard Gambetta
+  - "Rue de la Libert\xE9"
+  - Avenue Charles de Gaulle
+  - Rue Pasteur
+  - "Place du G\xE9n\xE9ral de Gaulle"
+  - Rue Jean Moulin
+  - Avenue de la Gare
+  - "Rue des \xC9coles"
+  - Boulevard Saint-Michel
+  - "Rue de l'\xC9glise"
+  - Avenue Foch
+  - Rue Nationale
+  frenchProfessions:
+  - Comptable
+  - Professeur
+  - "Infirmi\xE8re"
+  - "Ing\xE9nieur"
+  - "Secr\xE9taire"
+  - "M\xE9canicien"
+  - Boulanger
+  - Pharmacien
+  - Architecte
+  - "\xC9lectricien"
+  - Coiffeur
+  - "M\xE9decin"
+  - Avocat
+  - Plombier
+  - Journaliste
+  - Cuisinier
+  - Policier
+  - Agriculteur
+  - Vendeur
+  - Chauffeur
+  - Artisan
+  - Fonctionnaire
+  - Technicien
+  - Commercial
+  frenchRequestTypes:
+  - "Demande de cong\xE9s pay\xE9s"
+  - "Certificat m\xE9dical de complaisance"
+  - Autorisation de travaux
+  - "Permis de construire une niche \xE0 chien"
+  - "D\xE9claration de perte de chaussette"
+  - Formulaire de changement d'adresse de chat
+  - Demande d'autorisation de respirer
+  - Certificat de vie pour plante verte
+  - Permis de marcher sur le trottoir
+  - "Autorisation de porter des chaussettes d\xE9pareill\xE9es"
+  - "D\xE9claration de sourire en public"
+  - "Formulaire de justification de b\xE2illement"
+  - "Demande de cong\xE9 pour aller aux toilettes"
+  batchSize: 50

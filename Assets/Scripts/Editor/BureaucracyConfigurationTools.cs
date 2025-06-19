@@ -1,5 +1,6 @@
 #if UNITY_EDITOR
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEditor;
 using System.Collections.Generic;
 using System.IO;
@@ -599,7 +600,7 @@ public static class BureaucracyConfigurationTools
         
         // Save as prefab
         PrefabUtility.SaveAsPrefabAsset(fieldGO, path);
-        DestroyImmediate(fieldGO);
+        Object.DestroyImmediate(fieldGO);
     }
     
     private static void CreateDropdownFieldPrefab(string path)
@@ -669,7 +670,7 @@ public static class BureaucracyConfigurationTools
         
         // Save as prefab
         PrefabUtility.SaveAsPrefabAsset(fieldGO, path);
-        DestroyImmediate(fieldGO);
+        Object.DestroyImmediate(fieldGO);
     }
     
     private static void CreateCheckboxFieldPrefab(string path)
@@ -722,7 +723,7 @@ public static class BureaucracyConfigurationTools
         
         // Save as prefab
         PrefabUtility.SaveAsPrefabAsset(fieldGO, path);
-        DestroyImmediate(fieldGO);
+        Object.DestroyImmediate(fieldGO);
     }
     
     private static void CreateDateFieldPrefab(string path)
@@ -795,7 +796,7 @@ public static class BureaucracyConfigurationTools
         
         // Save as prefab
         PrefabUtility.SaveAsPrefabAsset(itemGO, path);
-        DestroyImmediate(itemGO);
+        Object.DestroyImmediate(itemGO);
     }
     
     [MenuItem("Tools/Paper Trail/Configuration/Setup Complete Project Structure")]
