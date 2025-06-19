@@ -18,19 +18,37 @@ public class DocumentItemUI : MonoBehaviour
     public Color completedColor = Color.green;
 
     private DocumentData documentData;
-    private InboxUI inboxUI;
+    
+    // Support pour les deux types d'inbox (legacy et enhanced)
+    private InboxUI legacyInboxUI;
+    private EnhancedInboxUI enhancedInboxUI;
 
+    // Setup method pour legacy InboxUI
     public void Setup(DocumentData document, InboxUI inbox)
     {
         documentData = document;
-        inboxUI = inbox;
+        legacyInboxUI = inbox;
+        enhancedInboxUI = null;
 
-        Debug.Log($"Setting up DocumentItem: {document.documentTitle}");
-        Debug.Log($"Button found: {selectButton != null}");
-        Debug.Log($"InboxUI found: {inboxUI != null}");
-
+        Debug.Log($"Setting up DocumentItem (Legacy): {document.documentTitle}");
         UpdateDisplay();
+        SetupButton();
+    }
 
+    // Setup method pour Enhanced InboxUI
+    public void Setup(DocumentData document, EnhancedInboxUI inbox)
+    {
+        documentData = document;
+        enhancedInboxUI = inbox;
+        legacyInboxUI = null;
+
+        Debug.Log($"Setting up DocumentItem (Enhanced): {document.documentTitle}");
+        UpdateDisplay();
+        SetupButton();
+    }
+
+    private void SetupButton()
+    {
         if (selectButton != null)
         {
             selectButton.onClick.RemoveAllListeners();
@@ -83,12 +101,38 @@ public class DocumentItemUI : MonoBehaviour
     public void OnSelectDocument()
     {
         Debug.Log("Button clicked!");
-        Debug.Log($"InboxUI: {inboxUI != null}");
-        Debug.Log($"DocumentData: {documentData != null}");
-
-        if (inboxUI != null && documentData != null)
+        
+        if (documentData == null)
         {
-            inboxUI.SelectDocument(documentData);
+            Debug.LogWarning("No document data available!");
+            return;
         }
+
+        // Essaie d'abord avec Enhanced, puis avec Legacy
+        if (enhancedInboxUI != null)
+        {
+            Debug.Log($"Using Enhanced InboxUI for document: {documentData.documentTitle}");
+            enhancedInboxUI.SelectDocument(documentData);
+        }
+        else if (legacyInboxUI != null)
+        {
+            Debug.Log($"Using Legacy InboxUI for document: {documentData.documentTitle}");
+            legacyInboxUI.SelectDocument(documentData);
+        }
+        else
+        {
+            Debug.LogError("No InboxUI reference available (neither Legacy nor Enhanced)!");
+        }
+    }
+
+    // Méthode pour vérifier quel type d'inbox est utilisé
+    public bool IsUsingEnhancedUI()
+    {
+        return enhancedInboxUI != null;
+    }
+
+    public bool IsUsingLegacyUI()
+    {
+        return legacyInboxUI != null;
     }
 }
