@@ -8,6 +8,10 @@ public class GameManager : MonoBehaviour
     public int citizensServed = 0;
     public int citizensAbandoned = 0;
 
+    [Header("Dynamic Configuration")]
+    public DynamicConfigurationManager configurationManager;
+    public BureaucracyScenario currentScenario;
+    
     [Header("References")]
     public DocumentManager documentManager;
     public BureaucracySystem bureaucracySystem;
@@ -47,29 +51,53 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("Paper Trail - Bureaucracy Simulator Started!");
 
-        // Create initial vacation request for prototype
-        CreateInitialVacationRequest();
+        // Initialize configuration manager if not already done
+        if (configurationManager == null)
+        {
+            configurationManager = FindObjectOfType<DynamicConfigurationManager>();
+        }
+
+        // Load scenario
+        if (currentScenario != null && configurationManager != null)
+        {
+            configurationManager.LoadScenario(currentScenario);
+            Debug.Log($"Loaded scenario: {currentScenario.scenarioName}");
+        }
+        else
+        {
+            Debug.LogWarning("No scenario configured! Please assign a BureaucracyScenario.");
+        }
+
+        // Subscribe to configuration manager events
+        if (configurationManager != null)
+        {
+            configurationManager.OnDynamicDocumentGenerated += OnDynamicDocumentGenerated;
+            configurationManager.OnTriggerActivated += OnTriggerActivated;
+            configurationManager.OnNarrativeUpdate += OnNarrativeUpdate;
+        }
     }
 
-    private void CreateInitialVacationRequest()
+    private void OnDynamicDocumentGenerated(DocumentData document)
     {
-        CitizenRequest citizenRequest = new CitizenRequest("Jean Dupont", "3 days vacation");
-        DocumentData vacationDoc = new DocumentData();
+        Debug.Log($"New dynamic document generated: {document.documentTitle}");
+    }
 
-        vacationDoc.documentTitle = "Vacation Request - 3 Days";
-        vacationDoc.documentType = DocumentType.VacationRequest;
-        vacationDoc.citizenName = citizenRequest.citizenName;
-        vacationDoc.requestDetails = "Requesting 3 days of vacation";
-        vacationDoc.bureaucracyLevel = 1;
-        vacationDoc.requiresStamp = true;
+    private void OnTriggerActivated(BureaucracyTrigger trigger)
+    {
+        Debug.Log($"Bureaucracy trigger activated: {trigger.triggerName}");
+        IncrementBureaucracyScore(trigger.bureaucracyScoreBonus);
+    }
 
-        // Add form fields
-        vacationDoc.formFields.Add("Start Date", "");
-        vacationDoc.formFields.Add("End Date", "");
-        vacationDoc.formFields.Add("Reason", "");
-        vacationDoc.formFields.Add("Emergency Contact", "");
-
-        documentManager.AddDocument(vacationDoc);
+    private void OnNarrativeUpdate(string narrativeText)
+    {
+        Debug.Log($"Narrative update: {narrativeText}");
+        
+        // Display narrative through UI systems
+        var gameUI = FindObjectOfType<GameUI>();
+        if (gameUI != null)
+        {
+            gameUI.ShowNotification(narrativeText);
+        }
     }
 
     public void IncrementBureaucracyScore(int points)
@@ -82,5 +110,34 @@ public class GameManager : MonoBehaviour
     {
         documentsProcessed++;
         IncrementBureaucracyScore(10); // Each processed document gives points
+    }
+
+    // Method to switch scenarios during runtime
+    public void LoadNewScenario(BureaucracyScenario scenario)
+    {
+        currentScenario = scenario;
+        if (configurationManager != null)
+        {
+            configurationManager.LoadScenario(scenario);
+        }
+    }
+
+    // Get current scenario status
+    public BureaucracyScenarioStatus GetScenarioStatus()
+    {
+        if (configurationManager != null)
+        {
+            return configurationManager.GetScenarioStatus();
+        }
+        
+        // Fallback status
+        return new BureaucracyScenarioStatus
+        {
+            scenarioName = "No Scenario",
+            documentsProcessed = documentsProcessed,
+            currentScore = bureaucracyScore,
+            activeCitizensCount = 0,
+            availableTemplatesCount = 0
+        };
     }
 }

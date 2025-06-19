@@ -74,7 +74,7 @@ public class GameUI : MonoBehaviour
         ShowNotification($"Document processed: {document.documentTitle}");
     }
 
-    private void ShowNotification(string message)
+    public void ShowNotification(string message)
     {
         if (notificationPanel != null && notificationText != null)
         {

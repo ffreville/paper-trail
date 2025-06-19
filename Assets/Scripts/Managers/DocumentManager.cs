@@ -9,10 +9,22 @@ public class DocumentManager : MonoBehaviour
     public List<DocumentData> inboxDocuments = new List<DocumentData>();
     public List<DocumentData> processedDocuments = new List<DocumentData>();
 
+    [Header("Dynamic Configuration")]
+    public DynamicConfigurationManager configurationManager;
+
     [Header("Events")]
     public System.Action<DocumentData> OnDocumentAdded;
     public System.Action<DocumentData> OnDocumentProcessed;
     public System.Action<DocumentData> OnDocumentRejected;
+
+    private void Start()
+    {
+        // Find configuration manager if not assigned
+        if (configurationManager == null)
+        {
+            configurationManager = FindObjectOfType<DynamicConfigurationManager>();
+        }
+    }
 
     public void AddDocument(DocumentData document)
     {
@@ -34,21 +46,50 @@ public class DocumentManager : MonoBehaviour
         document.status = DocumentStatus.InProgress;
         document.lastModified = System.DateTime.Now;
 
-        // Check if document triggers bureaucracy cascade
-        BureaucracySystem bureaucracySystem = FindObjectOfType<BureaucracySystem>();
-        if (bureaucracySystem != null)
+        // Use dynamic configuration for bureaucracy cascades
+        if (configurationManager != null)
         {
-            bureaucracySystem.ProcessDocument(document);
+            var template = configurationManager.GetTemplate(document.documentType);
+            if (template != null)
+            {
+                ProcessDynamicDocument(document, template);
+            }
         }
 
         // Move to processed
         inboxDocuments.Remove(document);
         processedDocuments.Add(document);
 
-        GameManager.Instance.DocumentProcessed();
-        OnDocumentProcessed?.Invoke(document);
+        // Notify game manager
+        var gameManager = GameManager.Instance;
+        if (gameManager != null)
+        {
+            gameManager.DocumentProcessed();
+        }
 
+        OnDocumentProcessed?.Invoke(document);
         Debug.Log($"Document processed: {document.documentTitle}");
+    }
+
+    private void ProcessDynamicDocument(DocumentData document, DocumentTemplate template)
+    {
+        Debug.Log($"Processing document with dynamic template: {template.documentTitle}");
+        
+        // Apply bureaucracy level
+        document.bureaucracyLevel = template.baseBureaucracyLevel;
+        
+        // Check requirements
+        if (template.requiresStamp)
+        {
+            Debug.Log("Document requires stamp!");
+        }
+        
+        if (template.requiresSignature)
+        {
+            Debug.Log("Document requires signature!");
+        }
+        
+        // The DynamicConfigurationManager handles trigger processing automatically
     }
 
     public void RejectDocument(DocumentData document, string reason)
@@ -61,6 +102,18 @@ public class DocumentManager : MonoBehaviour
 
         OnDocumentRejected?.Invoke(document);
         Debug.Log($"Document rejected: {document.documentTitle} - Reason: {reason}");
+    }
+
+    // Dynamic document creation using templates
+    public DocumentData CreateDocumentFromTemplate(DocumentTemplate template, FrenchCitizenData citizen)
+    {
+        if (configurationManager != null)
+        {
+            return configurationManager.GenerateDocumentFromTemplate(template, citizen);
+        }
+        
+        Debug.LogWarning("No configuration manager available for dynamic document creation");
+        return null;
     }
 
     public List<DocumentData> GetDocumentsByType(DocumentType type)
@@ -81,5 +134,18 @@ public class DocumentManager : MonoBehaviour
     public int GetInboxCount()
     {
         return inboxDocuments.Count;
+    }
+
+    // Method to force generation of specific document type
+    public void RequestDocument(DocumentType docType, string citizenName = null)
+    {
+        if (configurationManager != null)
+        {
+            configurationManager.ForceGenerateDocument(docType, citizenName);
+        }
+        else
+        {
+            Debug.LogWarning("Cannot request document - no configuration manager available");
+        }
     }
 }

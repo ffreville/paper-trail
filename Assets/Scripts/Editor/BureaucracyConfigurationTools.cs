@@ -1,6 +1,8 @@
 #if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
+using UnityEngine.UI;
+using TMPro;
 using System.Collections.Generic;
 using System.IO;
 
@@ -443,11 +445,11 @@ public static class BureaucracyConfigurationTools
     public static void GenerateFrenchCitizensDatabase()
     {
         // Find or create French Data Generator
-        FrenchDataGenerator generator = Resources.Load<FrenchDataGenerator>("FrenchDataGenerator");
+        FrenchDataGenerator generator = AssetDatabase.LoadAssetAtPath<FrenchDataGenerator>("Assets/PaperTrail/Data/FrenchDataGenerator.asset");
         if (generator == null)
         {
             CreateFrenchDataGenerator();
-            generator = Resources.Load<FrenchDataGenerator>("FrenchDataGenerator");
+            generator = AssetDatabase.LoadAssetAtPath<FrenchDataGenerator>("Assets/PaperTrail/Data/FrenchDataGenerator.asset");
         }
         
         if (generator == null)
@@ -489,453 +491,73 @@ public static class BureaucracyConfigurationTools
         }
     }
     
-    [MenuItem("Tools/Paper Trail/Configuration/Create Prefab Templates")]
-    public static void CreatePrefabTemplates()
+    [MenuItem("Tools/Paper Trail/Configuration/Clear All Paper Trail Objects")]
+    public static void ClearAllObjects()
     {
-        string prefabPath = "Assets/PaperTrail/Prefabs/";
-        EnsureDirectoryExists(prefabPath);
-        
-        // Create form field prefabs
-        CreateFormFieldPrefabs(prefabPath);
-        
-        // Create document item prefab
-        CreateDocumentItemPrefab(prefabPath);
-        
-        EditorUtility.DisplayDialog(
-            "Prefabs Created!",
-            "All necessary prefab templates have been created in:\n" + prefabPath,
-            "Perfect!"
+        bool confirm = EditorUtility.DisplayDialog(
+            "Clear All Objects",
+            "This will delete all Paper Trail objects in the scene. Are you sure?\n\n" +
+            "This action cannot be undone!",
+            "Yes, Clear All",
+            "Cancel"
         );
-    }
-    
-    private static void CreateFormFieldPrefabs(string basePath)
-    {
-        string fieldPath = basePath + "FormFields/";
-        EnsureDirectoryExists(fieldPath);
-        
-        // Text Field Prefab
-        CreateTextFieldPrefab(fieldPath + "TextFieldPrefab.prefab");
-        
-        // Dropdown Field Prefab
-        CreateDropdownFieldPrefab(fieldPath + "DropdownFieldPrefab.prefab");
-        
-        // Checkbox Field Prefab
-        CreateCheckboxFieldPrefab(fieldPath + "CheckboxFieldPrefab.prefab");
-        
-        // Date Field Prefab
-        CreateDateFieldPrefab(fieldPath + "DateFieldPrefab.prefab");
-        
-        // TextArea Field Prefab
-        CreateTextAreaFieldPrefab(fieldPath + "TextAreaFieldPrefab.prefab");
-    }
-    
-    private static void CreateTextFieldPrefab(string path)
-    {
-        GameObject fieldGO = new GameObject("TextFieldPrefab");
-        
-        // Add RectTransform
-        RectTransform rt = fieldGO.AddComponent<RectTransform>();
-        rt.sizeDelta = new Vector2(350, 60);
-        
-        // Add VerticalLayoutGroup
-        VerticalLayoutGroup vlg = fieldGO.AddComponent<VerticalLayoutGroup>();
-        vlg.spacing = 5;
-        vlg.childForceExpandHeight = false;
-        vlg.childControlHeight = false;
-        
-        // Create Label
-        GameObject labelGO = new GameObject("Label");
-        labelGO.transform.SetParent(fieldGO.transform);
-        TMPro.TextMeshProUGUI label = labelGO.AddComponent<TMPro.TextMeshProUGUI>();
-        label.text = "Field Label";
-        label.fontSize = 14;
-        label.color = Color.black;
-        
-        RectTransform labelRT = labelGO.GetComponent<RectTransform>();
-        labelRT.sizeDelta = new Vector2(350, 20);
-        
-        // Create InputField
-        GameObject inputGO = new GameObject("InputField");
-        inputGO.transform.SetParent(fieldGO.transform);
-        
-        UnityEngine.UI.Image inputBG = inputGO.AddComponent<UnityEngine.UI.Image>();
-        inputBG.color = Color.white;
-        
-        TMPro.TMP_InputField inputField = inputGO.AddComponent<TMPro.TMP_InputField>();
-        
-        // Create Text component for input
-        GameObject textGO = new GameObject("Text");
-        textGO.transform.SetParent(inputGO.transform);
-        TMPro.TextMeshProUGUI inputText = textGO.AddComponent<TMPro.TextMeshProUGUI>();
-        inputText.color = Color.black;
-        inputText.fontSize = 12;
-        
-        RectTransform textRT = textGO.GetComponent<RectTransform>();
-        textRT.anchorMin = Vector2.zero;
-        textRT.anchorMax = Vector2.one;
-        textRT.offsetMin = new Vector2(10, 0);
-        textRT.offsetMax = new Vector2(-10, 0);
-        
-        // Create Placeholder
-        GameObject placeholderGO = new GameObject("Placeholder");
-        placeholderGO.transform.SetParent(inputGO.transform);
-        TMPro.TextMeshProUGUI placeholder = placeholderGO.AddComponent<TMPro.TextMeshProUGUI>();
-        placeholder.text = "Enter text...";
-        placeholder.color = new Color(0.5f, 0.5f, 0.5f);
-        placeholder.fontSize = 12;
-        
-        RectTransform placeholderRT = placeholderGO.GetComponent<RectTransform>();
-        placeholderRT.anchorMin = Vector2.zero;
-        placeholderRT.anchorMax = Vector2.one;
-        placeholderRT.offsetMin = new Vector2(10, 0);
-        placeholderRT.offsetMax = new Vector2(-10, 0);
-        
-        // Configure InputField
-        inputField.textComponent = inputText;
-        inputField.placeholder = placeholder;
-        
-        RectTransform inputRT = inputGO.GetComponent<RectTransform>();
-        inputRT.sizeDelta = new Vector2(350, 30);
-        
-        // Save as prefab
-        PrefabUtility.SaveAsPrefabAsset(fieldGO, path);
-        DestroyImmediate(fieldGO);
-    }
-    
-    private static void CreateDropdownFieldPrefab(string path)
-    {
-        GameObject fieldGO = new GameObject("DropdownFieldPrefab");
-        
-        // Add RectTransform and layout
-        RectTransform rt = fieldGO.AddComponent<RectTransform>();
-        rt.sizeDelta = new Vector2(350, 60);
-        
-        VerticalLayoutGroup vlg = fieldGO.AddComponent<VerticalLayoutGroup>();
-        vlg.spacing = 5;
-        vlg.childForceExpandHeight = false;
-        vlg.childControlHeight = false;
-        
-        // Create Label
-        GameObject labelGO = new GameObject("Label");
-        labelGO.transform.SetParent(fieldGO.transform);
-        TMPro.TextMeshProUGUI label = labelGO.AddComponent<TMPro.TextMeshProUGUI>();
-        label.text = "Dropdown Label";
-        label.fontSize = 14;
-        label.color = Color.black;
-        
-        // Create Dropdown
-        GameObject dropdownGO = new GameObject("Dropdown");
-        dropdownGO.transform.SetParent(fieldGO.transform);
-        
-        UnityEngine.UI.Image dropdownBG = dropdownGO.AddComponent<UnityEngine.UI.Image>();
-        dropdownBG.color = Color.white;
-        
-        TMPro.TMP_Dropdown dropdown = dropdownGO.AddComponent<TMPro.TMP_Dropdown>();
-        
-        // Create Label for dropdown
-        GameObject dropdownLabelGO = new GameObject("Label");
-        dropdownLabelGO.transform.SetParent(dropdownGO.transform);
-        TMPro.TextMeshProUGUI dropdownLabel = dropdownLabelGO.AddComponent<TMPro.TextMeshProUGUI>();
-        dropdownLabel.text = "Option 1";
-        dropdownLabel.color = Color.black;
-        dropdownLabel.fontSize = 12;
-        
-        RectTransform dropdownLabelRT = dropdownLabelGO.GetComponent<RectTransform>();
-        dropdownLabelRT.anchorMin = Vector2.zero;
-        dropdownLabelRT.anchorMax = Vector2.one;
-        dropdownLabelRT.offsetMin = new Vector2(10, 0);
-        dropdownLabelRT.offsetMax = new Vector2(-25, 0);
-        
-        // Create Arrow
-        GameObject arrowGO = new GameObject("Arrow");
-        arrowGO.transform.SetParent(dropdownGO.transform);
-        UnityEngine.UI.Image arrow = arrowGO.AddComponent<UnityEngine.UI.Image>();
-        arrow.color = Color.black;
-        
-        RectTransform arrowRT = arrowGO.GetComponent<RectTransform>();
-        arrowRT.anchorMin = new Vector2(1, 0.5f);
-        arrowRT.anchorMax = new Vector2(1, 0.5f);
-        arrowRT.sizeDelta = new Vector2(20, 20);
-        arrowRT.anchoredPosition = new Vector2(-15, 0);
-        
-        // Configure dropdown
-        dropdown.captionText = dropdownLabel;
-        dropdown.options.Add(new TMPro.TMP_Dropdown.OptionData("Option 1"));
-        dropdown.options.Add(new TMPro.TMP_Dropdown.OptionData("Option 2"));
-        dropdown.options.Add(new TMPro.TMP_Dropdown.OptionData("Option 3"));
-        
-        RectTransform dropdownRT = dropdownGO.GetComponent<RectTransform>();
-        dropdownRT.sizeDelta = new Vector2(350, 30);
-        
-        // Save as prefab
-        PrefabUtility.SaveAsPrefabAsset(fieldGO, path);
-        DestroyImmediate(fieldGO);
-    }
-    
-    private static void CreateCheckboxFieldPrefab(string path)
-    {
-        GameObject fieldGO = new GameObject("CheckboxFieldPrefab");
-        
-        // Add RectTransform and layout
-        RectTransform rt = fieldGO.AddComponent<RectTransform>();
-        rt.sizeDelta = new Vector2(350, 30);
-        
-        HorizontalLayoutGroup hlg = fieldGO.AddComponent<HorizontalLayoutGroup>();
-        hlg.spacing = 10;
-        hlg.childForceExpandWidth = false;
-        hlg.childControlWidth = false;
-        
-        // Create Toggle (Checkbox)
-        GameObject toggleGO = new GameObject("Toggle");
-        toggleGO.transform.SetParent(fieldGO.transform);
-        
-        UnityEngine.UI.Image toggleBG = toggleGO.AddComponent<UnityEngine.UI.Image>();
-        toggleBG.color = Color.white;
-        
-        UnityEngine.UI.Toggle toggle = toggleGO.AddComponent<UnityEngine.UI.Toggle>();
-        
-        // Create Checkmark
-        GameObject checkmarkGO = new GameObject("Checkmark");
-        checkmarkGO.transform.SetParent(toggleGO.transform);
-        UnityEngine.UI.Image checkmark = checkmarkGO.AddComponent<UnityEngine.UI.Image>();
-        checkmark.color = Color.green;
-        
-        RectTransform checkmarkRT = checkmarkGO.GetComponent<RectTransform>();
-        checkmarkRT.anchorMin = Vector2.zero;
-        checkmarkRT.anchorMax = Vector2.one;
-        checkmarkRT.offsetMin = Vector2.zero;
-        checkmarkRT.offsetMax = Vector2.zero;
-        
-        // Configure toggle
-        toggle.graphic = checkmark;
-        
-        RectTransform toggleRT = toggleGO.GetComponent<RectTransform>();
-        toggleRT.sizeDelta = new Vector2(20, 20);
-        
-        // Create Label
-        GameObject labelGO = new GameObject("Label");
-        labelGO.transform.SetParent(fieldGO.transform);
-        TMPro.TextMeshProUGUI label = labelGO.AddComponent<TMPro.TextMeshProUGUI>();
-        label.text = "Checkbox Label";
-        label.fontSize = 14;
-        label.color = Color.black;
-        
-        // Save as prefab
-        PrefabUtility.SaveAsPrefabAsset(fieldGO, path);
-        DestroyImmediate(fieldGO);
-    }
-    
-    private static void CreateDateFieldPrefab(string path)
-    {
-        // Similar to text field but with date validation
-        CreateTextFieldPrefab(path);
-        // The validation will be handled by the DynamicDocumentUI component
-    }
-    
-    private static void CreateTextAreaFieldPrefab(string path)
-    {
-        // Similar to text field but with multiline capability
-        CreateTextFieldPrefab(path);
-        // The multiline setting will be configured in DynamicDocumentUI
-    }
-    
-    private static void CreateDocumentItemPrefab(string path)
-    {
-        GameObject itemGO = new GameObject("DocumentItemPrefab");
-        
-        // Add RectTransform
-        RectTransform rt = itemGO.AddComponent<RectTransform>();
-        rt.sizeDelta = new Vector2(380, 80);
-        
-        // Add Background Image
-        UnityEngine.UI.Image bg = itemGO.AddComponent<UnityEngine.UI.Image>();
-        bg.color = new Color(0.95f, 0.95f, 0.95f);
-        
-        // Add Button component
-        UnityEngine.UI.Button button = itemGO.AddComponent<UnityEngine.UI.Button>();
-        
-        // Add VerticalLayoutGroup
-        VerticalLayoutGroup vlg = itemGO.AddComponent<VerticalLayoutGroup>();
-        vlg.padding = new RectOffset(10, 10, 5, 5);
-        vlg.spacing = 2;
-        vlg.childForceExpandHeight = false;
-        vlg.childControlHeight = false;
-        
-        // Create Title Text
-        GameObject titleGO = new GameObject("TitleText");
-        titleGO.transform.SetParent(itemGO.transform);
-        TMPro.TextMeshProUGUI title = titleGO.AddComponent<TMPro.TextMeshProUGUI>();
-        title.text = "Document Title";
-        title.fontSize = 14;
-        title.fontStyle = TMPro.FontStyles.Bold;
-        title.color = Color.black;
-        
-        // Create Citizen Text
-        GameObject citizenGO = new GameObject("CitizenText");
-        citizenGO.transform.SetParent(itemGO.transform);
-        TMPro.TextMeshProUGUI citizen = citizenGO.AddComponent<TMPro.TextMeshProUGUI>();
-        citizen.text = "From: Citizen Name";
-        citizen.fontSize = 12;
-        citizen.color = new Color(0.3f, 0.3f, 0.3f);
-        
-        // Create Status Text
-        GameObject statusGO = new GameObject("StatusText");
-        statusGO.transform.SetParent(itemGO.transform);
-        TMPro.TextMeshProUGUI status = statusGO.AddComponent<TMPro.TextMeshProUGUI>();
-        status.text = "Status: Pending";
-        status.fontSize = 11;
-        status.color = Color.blue;
-        
-        // Add DocumentItemUI script
-        DocumentItemUI itemUI = itemGO.AddComponent<DocumentItemUI>();
-        itemUI.titleText = title;
-        itemUI.citizenText = citizen;
-        itemUI.statusText = status;
-        itemUI.selectButton = button;
-        
-        // Save as prefab
-        PrefabUtility.SaveAsPrefabAsset(itemGO, path);
-        DestroyImmediate(itemGO);
-    }
-    
-    [MenuItem("Tools/Paper Trail/Configuration/Setup Complete Project Structure")]
-    public static void SetupCompleteProjectStructure()
-    {
-        // Create all necessary directories
-        EnsureDirectoryExists("Assets/PaperTrail/");
-        EnsureDirectoryExists(TEMPLATES_PATH);
-        EnsureDirectoryExists(SCENARIOS_PATH);
-        EnsureDirectoryExists(DATA_GENERATOR_PATH);
-        EnsureDirectoryExists("Assets/PaperTrail/Prefabs/");
-        EnsureDirectoryExists("Assets/PaperTrail/Prefabs/FormFields/");
-        EnsureDirectoryExists("Assets/PaperTrail/Resources/");
-        
-        // Generate complete vacation scenario
-        GenerateCompleteVacationScenario();
-        
-        // Create French data generator
-        CreateFrenchDataGenerator();
-        
-        // Create prefab templates
-        CreatePrefabTemplates();
-        
-        // Generate citizens database
-        GenerateFrenchCitizensDatabase();
-        
-        AssetDatabase.Refresh();
-        
-        EditorUtility.DisplayDialog(
-            "Project Setup Complete!",
-            "Paper Trail project structure has been completely set up with:\n\n" +
-            "✓ Document Templates\n" +
-            "✓ Bureaucracy Scenarios\n" +
-            "✓ French Data Generator\n" +
-            "✓ Form Field Prefabs\n" +
-            "✓ Citizens Database\n" +
-            "✓ Complete Vacation Nightmare Scenario\n\n" +
-            "You can now start customizing your bureaucratic nightmare!",
-            "Magnifique!"
-        );
-        
-        Debug.Log("=== PAPER TRAIL PROJECT SETUP COMPLETE ===");
-        Debug.Log("All systems ready for bureaucratic chaos!");
-    }
-    
-    [MenuItem("Tools/Paper Trail/Configuration/Validate Configuration")]
-    public static void ValidateConfiguration()
-    {
-        List<string> issues = new List<string>();
-        List<string> success = new List<string>();
-        
-        // Check for templates
-        string[] templateGuids = AssetDatabase.FindAssets("t:DocumentTemplate");
-        if (templateGuids.Length == 0)
+
+        if (!confirm) return;
+
+        // Find and destroy all Paper Trail objects in the scene
+        Canvas canvas = Object.FindObjectOfType<Canvas>();
+        if (canvas != null) 
         {
-            issues.Add("❌ No DocumentTemplate assets found");
+            EditorApplication.delayCall += () => Object.DestroyImmediate(canvas.gameObject);
         }
-        else
+
+        UnityEngine.EventSystems.EventSystem eventSystem = Object.FindObjectOfType<UnityEngine.EventSystems.EventSystem>();
+        if (eventSystem != null) 
         {
-            success.Add($"✅ Found {templateGuids.Length} DocumentTemplate(s)");
+            EditorApplication.delayCall += () => Object.DestroyImmediate(eventSystem.gameObject);
         }
-        
-        // Check for scenarios
-        string[] scenarioGuids = AssetDatabase.FindAssets("t:BureaucracyScenario");
-        if (scenarioGuids.Length == 0)
+
+        GameManager gameManager = Object.FindObjectOfType<GameManager>();
+        if (gameManager != null) 
         {
-            issues.Add("❌ No BureaucracyScenario assets found");
+            EditorApplication.delayCall += () => Object.DestroyImmediate(gameManager.gameObject);
         }
-        else
+
+        DocumentManager documentManager = Object.FindObjectOfType<DocumentManager>();
+        if (documentManager != null) 
         {
-            success.Add($"✅ Found {scenarioGuids.Length} BureaucracyScenario(s)");
+            EditorApplication.delayCall += () => Object.DestroyImmediate(documentManager.gameObject);
         }
-        
-        // Check for data generator
-        string[] generatorGuids = AssetDatabase.FindAssets("t:FrenchDataGenerator");
-        if (generatorGuids.Length == 0)
+
+        BureaucracySystem bureaucracySystem = Object.FindObjectOfType<BureaucracySystem>();
+        if (bureaucracySystem != null) 
         {
-            issues.Add("❌ No FrenchDataGenerator assets found");
+            EditorApplication.delayCall += () => Object.DestroyImmediate(bureaucracySystem.gameObject);
         }
-        else
-        {
-            success.Add($"✅ Found {generatorGuids.Length} FrenchDataGenerator(s)");
-        }
-        
-        // Check for DynamicConfigurationManager in scene
+
         DynamicConfigurationManager configManager = Object.FindObjectOfType<DynamicConfigurationManager>();
-        if (configManager == null)
+        if (configManager != null)
         {
-            issues.Add("❌ No DynamicConfigurationManager found in scene");
+            EditorApplication.delayCall += () => Object.DestroyImmediate(configManager.gameObject);
         }
-        else
+
+        PhysiologicalNeedsManager needsManager = Object.FindObjectOfType<PhysiologicalNeedsManager>();
+        if (needsManager != null)
         {
-            success.Add("✅ DynamicConfigurationManager found in scene");
-            
-            if (configManager.currentScenario == null)
-            {
-                issues.Add("❌ DynamicConfigurationManager has no scenario assigned");
-            }
-            else
-            {
-                success.Add($"✅ Scenario assigned: {configManager.currentScenario.scenarioName}");
-            }
+            EditorApplication.delayCall += () => Object.DestroyImmediate(needsManager.gameObject);
         }
+
+        Debug.Log("All Paper Trail objects cleared!");
         
-        // Generate report
-        string report = "=== PAPER TRAIL CONFIGURATION VALIDATION ===\n\n";
-        
-        if (success.Count > 0)
-        {
-            report += "SUCCESS:\n";
-            foreach (string s in success)
-            {
-                report += s + "\n";
-            }
-            report += "\n";
-        }
-        
-        if (issues.Count > 0)
-        {
-            report += "ISSUES FOUND:\n";
-            foreach (string issue in issues)
-            {
-                report += issue + "\n";
-            }
-            report += "\n";
-            report += "Use Tools > Paper Trail > Configuration > Setup Complete Project Structure to fix these issues.";
-        }
-        else
-        {
-            report += "🎉 ALL SYSTEMS OPERATIONAL! 🎉\n";
-            report += "Ready for bureaucratic mayhem!";
-        }
-        
-        Debug.Log(report);
-        
-        string dialogTitle = issues.Count > 0 ? "Configuration Issues Found" : "Configuration Valid!";
-        EditorUtility.DisplayDialog(dialogTitle, report, "OK");
+        EditorUtility.DisplayDialog(
+            "Objects Cleared",
+            "All Paper Trail objects have been removed from the scene.",
+            "OK"
+        );
     }
-    
-    private static void EnsureDirectoryExists(string path)
+
+    // Helper method to ensure directory exists
+    public static void EnsureDirectoryExists(string path)
     {
         if (!AssetDatabase.IsValidFolder(path))
         {
