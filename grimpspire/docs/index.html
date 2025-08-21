@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grimspire - Gestionnaire de Cité Aventurière</title>
+    <!-- CSS Modulaire -->
+    <link rel="stylesheet" href="css/modules/reset.css">
+    <link rel="stylesheet" href="css/modules/layout.css">
+    <link rel="stylesheet" href="css/modules/menu.css">
+    <link rel="stylesheet" href="css/modules/buildings.css">
+    <link rel="stylesheet" href="css/modules/guild.css">
+    <link rel="stylesheet" href="css/modules/adventurers.css">
+    <link rel="stylesheet" href="css/modules/missions.css">
+    <link rel="stylesheet" href="css/modules/modal.css">
+    <link rel="stylesheet" href="css/modules/scrollbar.css">
+    <link rel="stylesheet" href="css/modules/responsive.css">
+    <link rel="stylesheet" href="css/modules/administration.css">
+    <link rel="stylesheet" href="css/modules/commerce.css">
+    <link rel="stylesheet" href="css/modules/industrie.css">
+    <link rel="stylesheet" href="css/modules/events.css">
+    <link rel="stylesheet" href="css/modules/achievements.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Menu Principal -->
+        <div id="main-menu" class="screen active">
+            <div class="menu-container">
+                <div class="logo-container">
+                    <img src="art/logo.png" alt="Grimspire Logo" class="game-logo">
+                </div>
+                <h1 class="game-title">GRIMSPIRE</h1>
+                <p class="game-subtitle">Gestionnaire de Cité Aventurière</p>
+                <p id="audio-hint" class="audio-hint">🔊 Cliquez n'importe où pour activer l'audio</p>
+                
+                <div class="menu-buttons">
+                    <button id="new-game-btn" class="menu-button primary">
+                        Nouvelle Partie
+                    </button>
+                    <button id="load-game-btn" class="menu-button" disabled>
+                        Charger Partie
+                    </button>
+                    <button id="settings-btn" class="menu-button" disabled>
+                        Options
+                    </button>
+                    <button id="quit-btn" class="menu-button" disabled>
+                        Quitter
+                    </button>
+                </div>
+                
+                <div class="version-info">
+                    Version 0.9.0 - Phase 9
+                </div>
+            </div>
+        </div>
+
+        <!-- Écran de jeu -->
+        <div id="game-screen" class="screen">
+            <!-- En-tête du jeu -->
+            <div class="game-header">
+                <div class="city-info">
+                    <div class="city-header">
+                        <img src="art/logo.png" alt="Grimspire Logo" class="game-header-logo">
+                        <div class="city-details">
+                            <h2 id="city-name">Grimspire</h2>
+                            <div class="time-info">
+                                <div class="main-time">
+                                    <span id="day-counter">Jour 1</span>
+                                    <span id="game-clock">00:00</span>
+                                </div>
+                                <div class="season-info">
+                                    <span id="season-icon">🌸</span>
+                                    <span id="season-name">Printemps</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="resources-panel">
+                    <div class="resource">
+                        <span class="resource-icon">💰</span>
+                        <div class="resource-info">
+                            <span id="gold-amount">10000</span>
+                            <span id="gold-hourly-gain" class="hourly-gain">+0/heure</span>
+                        </div>
+                    </div>
+                    <div class="resource">
+                        <span class="resource-icon">👥</span>
+                        <div class="resource-info">
+                            <span id="population-amount">0</span>
+                        </div>
+                    </div>
+                    <div class="resource">
+                        <span class="resource-icon">🔨</span>
+                        <div class="resource-info">
+                            <span id="materials-amount">2000</span>
+                            <span id="materials-hourly-gain" class="hourly-gain">+0/heure</span>
+                        </div>
+                    </div>
+                    <div class="resource">
+                        <span class="resource-icon">✨</span>
+                        <div class="resource-info">
+                            <span id="magic-amount">0</span>
+                            <span id="magic-hourly-gain" class="hourly-gain">+0/heure</span>
+                        </div>
+                    </div>
+                    <div class="resource">
+                        <span class="resource-icon">⭐</span>
+                        <div class="resource-info">
+                            <span id="reputation-amount">0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="game-controls">
+                    <button id="pause-game-btn" class="control-btn">⏸️ Pause</button>
+                    <button id="save-game-btn" class="control-btn">Sauvegarder</button>
+                    <button id="audio-toggle-btn" class="control-btn">🔊 Audio</button>
+                    <button id="return-menu-btn" class="control-btn">Menu</button>
+                </div>
+            </div>
+            
+            <!-- Navigation par onglets -->
+            <div class="tabs-navigation">
+                <button class="tab-btn" data-tab="evenements" style="position: relative;">
+                    Événements
+                    <span id="events-notification" class="events-notification" style="display: none;">0</span>
+                </button>
+                <button class="tab-btn active" data-tab="batiments">Bâtiments</button>
+                <button class="tab-btn" data-tab="commerce">Commerce</button>
+                <button class="tab-btn" data-tab="industrie">Industrie</button>
+                <button class="tab-btn" data-tab="administration" style="opacity: 0.5; cursor: not-allowed;" disabled>Administration</button>
+                <button class="tab-btn" data-tab="guilde" style="opacity: 0.5; cursor: not-allowed;" disabled>Guilde</button>
+                <button class="tab-btn" data-tab="expedition" style="opacity: 0.5; cursor: not-allowed;" disabled>Expéditions</button>
+                <button class="tab-btn" data-tab="succes">Succès</button>
+            </div>
+            
+            <!-- Contenu des onglets -->
+            <div class="tab-content">
+                <!-- Onglet Événements -->
+                <div id="tab-evenements" class="tab-panel">
+                    <div class="events-container">
+                        <!-- Sidebar gauche avec stats et contrôles -->
+                        <div class="events-sidebar">
+                            <!-- Statistiques des événements -->
+                            <div class="events-stats-sidebar">
+                                <h4>📊 Événements</h4>
+                                <div class="stat-item-sidebar">
+                                    <span class="stat-label">Non acquittés</span>
+                                    <span id="events-unacknowledged-count" class="stat-value highlight">0</span>
+                                </div>
+                                <div class="stat-item-sidebar">
+                                    <span class="stat-label">Total</span>
+                                    <span id="events-total-count" class="stat-value">0</span>
+                                </div>
+                                <div class="stat-item-sidebar">
+                                    <span class="stat-label">Dernière activité</span>
+                                    <span id="events-last-activity" class="stat-value">-</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Contrôles des événements -->
+                            <div class="events-controls-sidebar">
+                                <h4>⚙️ Actions</h4>
+                                <button id="acknowledge-all-events-btn" class="events-control-btn">
+                                    ✅ Acquitter tous les événements
+                                </button>
+                                <button id="clear-acknowledged-events-btn" class="events-control-btn">
+                                    🗑️ Effacer les événements acquittés
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Zone principale -->
+                        <div class="events-main">
+                            <div class="events-header">
+                                <h3 class="events-title">
+                                    📜 Journal des Événements
+                                </h3>
+                                <span class="events-count" id="events-section-count">0 événement</span>
+                            </div>
+                            
+                            <div id="events-list" class="events-grid">
+                                <!-- Les événements seront ajoutés dynamiquement -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Onglet Bâtiments -->
+                <div id="tab-batiments" class="tab-panel active">
+                    <div class="buildings-container">
+                        <!-- Sidebar gauche avec stats et contrôles -->
+                        <div class="buildings-sidebar">
+                            <div class="sidebar-header">
+                                <h3>Bâtiments</h3>
+                                <p>Construisez et gérez votre cité</p>
+                            </div>
+                            
+                            <!-- Statistiques des bâtiments -->
+                            <div class="building-stats-sidebar">
+                                <h4>📈 Statistiques</h4>
+                                <div class="stat-card-compact">
+                                    <span class="stat-label">Construits</span>
+                                    <span id="buildings-total-count" class="stat-value">0</span>
+                                </div>
+                                <div class="stat-card-compact">
+                                    <span class="stat-label">Niveau moyen</span>
+                                    <span id="buildings-avg-level" class="stat-value">0</span>
+                                </div>
+                                <div class="stat-card-compact">
+                                    <span class="stat-label">Types disponibles</span>
+                                    <span id="building-types-available" class="stat-value">0</span>
+                                </div>
+                                <div class="stat-card-compact">
+                                    <span class="stat-label">Types verrouillés</span>
+                                    <span id="building-types-locked" class="stat-value">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Zone principale avec les deux colonnes -->
+                        <div class="buildings-main">
+                            <div class="buildings-layout">
+                                <!-- Colonne de gauche : Bâtiments construits -->
+                                <div class="buildings-constructed">
+                                    <div class="column-header">
+                                        <h4 class="column-title">🏗️ Bâtiments Construits</h4>
+                                        <span class="section-count" id="constructed-count">0 bâtiment</span>
+                                    </div>
+                                    
+                                    <div class="buildings-section">
+                                        <div id="constructed-buildings" class="buildings-grid">
+                                            <!-- Les bâtiments construits seront ajoutés dynamiquement -->
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Colonne de droite : Types de bâtiments disponibles -->
+                                <div class="buildings-available">
+                                    <div class="column-header">
+                                        <h4 class="column-title">🏠 Types Disponibles</h4>
+                                        <div class="building-controls">
+                                            <span id="available-info" class="search-info">Sélectionnez un type pour construire</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="buildings-section">
+                                        <div id="available-building-types" class="building-types-grid">
+                                            <!-- Les types de bâtiments disponibles seront ajoutés dynamiquement -->
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Section des types verrouillés -->
+                                    <div class="buildings-section locked-section">
+                                        <div class="section-header">
+                                            <h5>Types Verrouillés</h5>
+                                            <span class="section-count" id="locked-types-count">Améliorations requises</span>
+                                        </div>
+                                        <div id="locked-building-types" class="building-types-grid locked">
+                                            <!-- Les types verrouillés seront ajoutés dynamiquement -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Modal de construction de bâtiment -->
+                <div id="building-construction-modal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3 id="modal-building-type-name">Construire un Bâtiment</h3>
+                            <button id="close-construction-modal-btn" class="close-btn">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="building-type-info">
+                                <div class="building-type-icon" id="modal-building-icon">🏠</div>
+                                <div class="building-type-details">
+                                    <h4 id="modal-building-name">Type de Bâtiment</h4>
+                                    <p id="modal-building-description">Description du bâtiment</p>
+                                </div>
+                            </div>
+                            
+                            <div class="construction-form">
+                                <div class="form-group">
+                                    <label for="building-custom-name">Nom du bâtiment (optionnel) :</label>
+                                    <input type="text" id="building-custom-name" maxlength="30" placeholder="Laissez vide pour un nom automatique...">
+                                    <small>Maximum 30 caractères - Un nom sera généré automatiquement si vide</small>
+                                </div>
+                                
+                                <div class="construction-cost">
+                                    <h5>Coût de construction :</h5>
+                                    <div id="modal-construction-cost" class="cost-list">
+                                        <!-- Coût sera ajouté dynamiquement -->
+                                    </div>
+                                </div>
+                                
+                                <div class="building-effects">
+                                    <h5>Effets (Niveau 1) :</h5>
+                                    <div id="modal-building-effects" class="effects-list">
+                                        <!-- Effets seront ajoutés dynamiquement -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="cancel-construction-btn" class="modal-btn secondary">Annuler</button>
+                            <button id="confirm-construction-btn" class="modal-btn primary">Construire</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Onglet Commerce -->
+                <div id="tab-commerce" class="tab-panel">
+                    <div class="commerce-container">
+                        <!-- Sidebar gauche avec menu vertical -->
+                        <div class="commerce-sidebar">
+                            <div class="sidebar-header">
+                                <h3>Commerce</h3>
+                                <p>Économie et négoce</p>
+                            </div>
+                            
+                            <!-- Menu vertical -->
+                            <div class="commerce-menu">
+                                <button class="commerce-menu-btn active" data-commerce-tab="marche" disabled>
+                                    🔒 Marché
+                                </button>
+                                <button class="commerce-menu-btn" data-commerce-tab="artisans" disabled>
+                                    🔒 Artisans
+                                </button>
+                                <button class="commerce-menu-btn" data-commerce-tab="banque" disabled>
+                                    🔒 Banque
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Zone principale avec contenu -->
+                        <div class="commerce-main">
+                            <!-- Onglet Marché -->
+                            <div id="commerce-marche" class="commerce-content active">
+                                <div class="commerce-content-header">
+                                    <h4>Marché</h4>
+                                    <p>Centre du négoce et des échanges</p>
+                                </div>
+                                <div class="locked-message" id="marche-locked-message">
+                                    <p>🔒 Construisez un marché pour débloquer cette section</p>
+                                </div>
+                                
+                                <!-- Section des actions du marché -->
+                                <div class="marche-actions" id="marche-actions-section" style="display: none;">
+                                    <div class="actions-grid">
+                                        <!-- Action Négociateur -->
+                                        <div class="market-action-card">
+                                            <div class="action-header">
+                                                <div class="action-icon">👔</div>
+                                                <div class="action-info">
+                                                    <h5>Envoyer un négociateur</h5>
+                                                    <p>Rechercher de nouveaux produits dans les autres cités</p>
+                                                </div>
+                                            </div>
+                                            <div class="action-details">
+                                                <div class="action-duration">Durée: 8 heures</div>
+                                                <div class="action-reward">Récompense: Matériaux</div>
+                                            </div>
+                                            <div class="action-status" id="negotiator-status">
+                                                <button id="send-negotiator-btn" class="action-btn primary">
+                                                    Envoyer négociateur
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Action Émissaire -->
+                                        <div class="market-action-card">
+                                            <div class="action-header">
+                                                <div class="action-icon">📢</div>
+                                                <div class="action-info">
+                                                    <h5>Envoyer un émissaire</h5>
+                                                    <p>Faire la promotion de vos marchés dans les autres cités</p>
+                                                </div>
+                                            </div>
+                                            <div class="action-details">
+                                                <div class="action-duration">Durée: 8 heures</div>
+                                                <div class="action-reward">Récompense: Or</div>
+                                            </div>
+                                            <div class="action-status" id="emissary-status">
+                                                <button id="send-emissary-btn" class="action-btn primary">
+                                                    Envoyer émissaire
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Onglet Artisans -->
+                            <div id="commerce-artisans" class="commerce-content">
+                                <div class="commerce-content-header">
+                                    <h4>Artisans</h4>
+                                    <p>Production de biens artisanaux</p>
+                                </div>
+                                <div class="locked-message" id="artisans-locked-message">
+                                    <p>🔒 Construisez une échoppe d'artisan pour débloquer cette section</p>
+                                </div>
+                                
+                                <!-- Section des actions des artisans -->
+                                <div class="artisans-actions" id="artisans-actions-section" style="display: none;">
+                                    <div class="actions-grid">
+                                        <!-- Action Travailler la nuit -->
+                                        <div class="artisan-action-card">
+                                            <div class="action-header">
+                                                <div class="action-icon">🌙</div>
+                                                <div class="action-info">
+                                                    <h5>Travailler la nuit</h5>
+                                                    <p>Augmenter la production de matériaux</p>
+                                                </div>
+                                            </div>
+                                            <div class="action-details">
+                                                <div class="action-duration">Durée: 8 heures</div>
+                                                <div class="action-effect">Effet: Double les matériaux pendant 1 jour</div>
+                                            </div>
+                                            <div class="action-status" id="night-work-status">
+                                                <button id="start-night-work-btn" class="action-btn primary">
+                                                    Lancer le travail de nuit
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Action Solder la marchandise -->
+                                        <div class="artisan-action-card">
+                                            <div class="action-header">
+                                                <div class="action-icon">💸</div>
+                                                <div class="action-info">
+                                                    <h5>Solder la marchandise</h5>
+                                                    <p>Vendre rapidement les stocks à prix réduit</p>
+                                                </div>
+                                            </div>
+                                            <div class="action-details">
+                                                <div class="action-duration">Durée: 8 heures</div>
+                                                <div class="action-effect">Effet: Double l'or pendant 1 jour</div>
+                                            </div>
+                                            <div class="action-status" id="clearance-status">
+                                                <button id="start-clearance-btn" class="action-btn primary">
+                                                    Lancer les soldes
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Onglet Banque -->
+                            <div id="commerce-banque" class="commerce-content">
+                                <div class="commerce-content-header">
+                                    <h4>Banque</h4>
+                                    <p>Services financiers et investissements</p>
+                                </div>
+                                
+                                <div id="banque-locked-message" class="locked-message">
+                                    <p>🔒 Construisez une banque pour débloquer cette section</p>
+                                </div>
+                                
+                                <!-- Section des actions des banques -->
+                                <div class="banque-actions" id="banque-actions-section" style="display: none;">
+                                    <div class="actions-grid">
+                                        <!-- Action Investissement commercial -->
+                                        <div class="bank-action-card">
+                                            <div class="action-header">
+                                                <div class="action-icon">💼</div>
+                                                <div class="action-info">
+                                                    <h5>Investir dans un commerce</h5>
+                                                    <p>Investissement sécurisé dans les commerces locaux</p>
+                                                </div>
+                                            </div>
+                                            <div class="action-details">
+                                                <div class="action-duration">Durée: 2 jours</div>
+                                                <div class="action-effect">Effet: 50% de chances de doubler l'or pendant 1 jour</div>
+                                            </div>
+                                            <div class="action-status" id="investment-status">
+                                                <button id="start-investment-btn" class="action-btn primary">
+                                                    Lancer l'investissement
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Action Financement d'expédition -->
+                                        <div class="bank-action-card">
+                                            <div class="action-header">
+                                                <div class="action-icon">⚔️</div>
+                                                <div class="action-info">
+                                                    <h5>Financer une expédition indépendante</h5>
+                                                    <p>Financement risqué d'aventuriers indépendants</p>
+                                                </div>
+                                            </div>
+                                            <div class="action-details">
+                                                <div class="action-duration">Durée: 2 jours</div>
+                                                <div class="action-effect">Effet: 25% gros succès (×5 or) / 70% échec (÷2 or) pendant 1 jour</div>
+                                            </div>
+                                            <div class="action-status" id="expedition-funding-status">
+                                                <button id="start-expedition-funding-btn" class="action-btn primary">
+                                                    Financer l'expédition
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Onglet Industrie -->
+                <div id="tab-industrie" class="tab-panel">
+                    <div class="industrie-container">
+                        <!-- Sidebar gauche avec menu vertical -->
+                        <div class="industrie-sidebar">
+                            <div class="sidebar-header">
+                                <h3>Industrie</h3>
+                                <p>Production et artisanat</p>
+                            </div>
+                            
+                            <!-- Menu vertical -->
+                            <div class="industrie-menu">
+                                <button class="industrie-menu-btn active" data-industrie-tab="forge" disabled>
+                                    🔒 Forge
+                                </button>
+                                <button class="industrie-menu-btn" data-industrie-tab="alchimistes" disabled>
+                                    🔒 Alchimistes
+                                </button>
+                                <button class="industrie-menu-btn" data-industrie-tab="enchanteurs" disabled>
+                                    🔒 Enchanteurs
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Zone principale avec contenu -->
+                        <div class="industrie-main">
+                            <!-- Onglet Forge -->
+                            <div id="industrie-forge" class="industrie-content active">
+                                <div class="industrie-content-header">
+                                    <h4>Forge</h4>
+                                    <p>Production d'équipements et d'outils</p>
+                                </div>
+                                <div class="locked-message">
+                                    <p>🔒 Construisez une forge pour débloquer cette section</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Onglet Alchimistes -->
+                            <div id="industrie-alchimistes" class="industrie-content">
+                                <div class="industrie-content-header">
+                                    <h4>Alchimistes</h4>
+                                    <p>Production de substances magiques</p>
+                                </div>
+                                <div class="locked-message">
+                                    <p>🔒 Construisez un alchimiste pour débloquer cette section</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Onglet Enchanteurs -->
+                            <div id="industrie-enchanteurs" class="industrie-content">
+                                <div class="industrie-content-header">
+                                    <h4>Enchanteurs</h4>
+                                    <p>Amélioration des équipements</p>
+                                </div>
+                                <div class="locked-message">
+                                    <p>🔒 Construisez un enchanteur pour débloquer cette section</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Onglet Succès -->
+                <div id="tab-succes" class="tab-panel">
+                    <div class="achievements-container">
+                        <!-- Sidebar gauche avec statistiques -->
+                        <div class="achievements-sidebar">
+                            <!-- Statistiques des succès -->
+                            <div class="achievements-stats-sidebar">
+                                <h4>🏆 Succès</h4>
+                                <div class="stat-item-sidebar">
+                                    <span class="stat-label">Débloqués</span>
+                                    <span id="achievements-unlocked-count" class="stat-value highlight">0</span>
+                                </div>
+                                <div class="stat-item-sidebar">
+                                    <span class="stat-label">Total</span>
+                                    <span id="achievements-total-count" class="stat-value">0</span>
+                                </div>
+                                <div class="stat-item-sidebar">
+                                    <span class="stat-label">Progression</span>
+                                    <span id="achievements-progress" class="stat-value">0%</span>
+                                </div>
+                                <div class="stat-item-sidebar">
+                                    <span class="stat-label">Dernière réussite</span>
+                                    <span id="achievements-last-unlock" class="stat-value">-</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Zone principale -->
+                        <div class="achievements-main">
+                            <div class="achievements-header">
+                                <h3 class="achievements-title">
+                                    🏆 Liste des Succès
+                                </h3>
+                                <span class="achievements-count" id="achievements-section-count">0 succès</span>
+                            </div>
+                            
+                            <div id="achievements-list" class="achievements-grid">
+                                <!-- Les succès seront ajoutés dynamiquement -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="tab-administration" class="tab-panel">
+                    <div class="administration-container">
+                        <!-- Sidebar gauche avec menu vertical -->
+                        <div class="admin-sidebar">
+                            <div class="sidebar-header">
+                                <h3>Administration</h3>
+                                <p>Gestion de votre cité</p>
+                            </div>
+                            
+                            <!-- Menu vertical -->
+                            <div class="admin-menu">
+                                <button class="admin-menu-btn active" data-admin-tab="upgrades">
+                                    🏗️ Améliorations de la ville
+                                </button>
+                                <button class="admin-menu-btn" data-admin-tab="tbd1" disabled>
+                                    🔒 TBD 1
+                                </button>
+                                <button class="admin-menu-btn" data-admin-tab="tbd2" disabled>
+                                    🔒 TBD 2
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Zone principale avec contenu -->
+                        <div class="admin-main">
+                            <!-- Onglet Améliorations de la ville -->
+                            <div id="admin-upgrades" class="admin-content active">
+                                <div class="admin-content-header">
+                                    <h4>Améliorations de la Ville</h4>
+                                    <p>Débloquez de nouveaux bâtiments et fonctionnalités pour votre cité</p>
+                                </div>
+                                
+                                <div id="city-upgrades-list" class="upgrades-grid">
+                                    <!-- Les améliorations seront ajoutées dynamiquement -->
+                                </div>
+                            </div>
+                            
+                            <!-- Onglets TBD (pour plus tard) -->
+                            <div id="admin-tbd1" class="admin-content">
+                                <div class="admin-content-header">
+                                    <h4>TBD 1</h4>
+                                    <p>Fonctionnalité à venir</p>
+                                </div>
+                            </div>
+                            
+                            <div id="admin-tbd2" class="admin-content">
+                                <div class="admin-content-header">
+                                    <h4>TBD 2</h4>
+                                    <p>Fonctionnalité à venir</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="tab-guilde" class="tab-panel">
+                    <div class="guild-container">
+                        <!-- Sidebar gauche avec stats et contrôles -->
+                        <div class="guild-sidebar">
+                            <div class="sidebar-header">
+                                <h3>Guilde des Aventuriers</h3>
+                                <p>Recrutez et gérez votre équipe</p>
+                            </div>
+                            
+                            <!-- Statistiques de la guilde -->
+                            <div class="guild-stats-sidebar">
+                                <h4>📊 Statistiques</h4>
+                                <div class="stat-card-compact">
+                                    <span class="stat-label">Recrutés</span>
+                                    <span id="guild-total-count" class="stat-value">0</span>
+                                </div>
+                                <div class="stat-card-compact">
+                                    <span class="stat-label">Disponibles</span>
+                                    <span id="guild-available-count" class="stat-value">0</span>
+                                </div>
+                                <div class="stat-card-compact">
+                                    <span class="stat-label">En mission</span>
+                                    <span id="guild-mission-count" class="stat-value">0</span>
+                                </div>
+                                <div class="stat-card-compact">
+                                    <span class="stat-label">Niveau moyen</span>
+                                    <span id="guild-avg-level" class="stat-value">0</span>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        
+                        <!-- Zone principale avec les deux colonnes -->
+                        <div class="guild-main">
+                            <div class="guild-layout">
+                                <!-- Colonne de gauche : Aventuriers recrutés -->
+                                <div class="guild-recruited">
+                                    <div class="column-header">
+                                        <h4 class="column-title">👥 Aventuriers Recrutés</h4>
+                                        <span class="section-count" id="recruited-count">0 aventurier</span>
+                                    </div>
+                                    
+                                    <div class="guild-section">
+                                        <div id="recruited-adventurers" class="adventurers-grid">
+                                            <!-- Les aventuriers recrutés seront ajoutés dynamiquement -->
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Colonne de droite : Aventuriers disponibles au recrutement -->
+                                <div class="guild-available">
+                                    <div class="column-header">
+                                        <h4 class="column-title">💼 Candidats Disponibles</h4>
+                                        <div class="recruitment-controls">
+                                            <button id="search-adventurers-btn" class="action-btn primary">
+                                                🔍 Rechercher
+                                            </button>
+                                            <span id="search-info" class="search-info">Coût: 50💰</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="guild-section">
+                                        <div id="available-adventurers" class="adventurers-grid">
+                                            <!-- Les aventuriers disponibles au recrutement seront ajoutés dynamiquement -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="tab-expedition" class="tab-panel">
+                    <div class="expedition-container">
+                        <!-- Sidebar gauche avec stats et contrôles -->
+                        <div class="expedition-sidebar">
+                            <div class="sidebar-header">
+                                <h3>Expéditions</h3>
+                                <p>Gérez vos missions d'aventuriers</p>
+                            </div>
+                            
+                            <!-- Statistiques des missions -->
+                            <div class="mission-stats-sidebar">
+                                <h4>📊 Statistiques</h4>
+                                <div class="stat-card-compact">
+                                    <span class="stat-label">Actives</span>
+                                    <span id="mission-active-count" class="stat-value">0</span>
+                                </div>
+                                <div class="stat-card-compact">
+                                    <span class="stat-label">Réussies</span>
+                                    <span id="mission-success-count" class="stat-value">0</span>
+                                </div>
+                                <div class="stat-card-compact">
+                                    <span class="stat-label">Taux de réussite</span>
+                                    <span id="mission-success-rate" class="stat-value">0%</span>
+                                </div>
+                                <div class="stat-card-compact">
+                                    <span class="stat-label">Disponibles</span>
+                                    <span id="mission-available-count" class="stat-value">5</span>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        
+                        <!-- Zone principale avec les deux colonnes -->
+                        <div class="expedition-main">
+                            <div class="expedition-layout">
+                                <!-- Colonne de gauche : Suivi des expéditions -->
+                                <div class="expedition-tracking">
+                                    <!-- Section Missions en Cours -->
+                                    <div class="mission-section">
+                                        <div class="section-header">
+                                            <h5>Missions en Cours</h5>
+                                            <span class="section-count" id="active-missions-count">0 mission(s)</span>
+                                        </div>
+                                        <div id="active-missions" class="missions-grid">
+                                            <!-- Les missions actives seront ajoutées dynamiquement -->
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Section Missions Terminées -->
+                                    <div class="mission-section">
+                                        <div class="section-header">
+                                            <h5>Missions Récentes</h5>
+                                            <span class="section-count" id="completed-missions-count">Historique</span>
+                                        </div>
+                                        <div id="completed-missions" class="missions-grid completed">
+                                            <!-- Les missions terminées seront ajoutées dynamiquement -->
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Colonne de droite : Missions disponibles -->
+                                <div class="expedition-available">
+                                    <div class="column-header">
+                                        <h4 class="column-title">🗺️ Missions Disponibles</h4>
+                                        <div class="mission-controls">
+                                            <button id="refresh-missions-btn" class="action-btn primary">
+                                                🔄 Actualiser
+                                            </button>
+                                            <span id="refresh-info" class="search-info">Coût: 100💰</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Section Missions Disponibles -->
+                                    <div class="mission-section">
+                                        <div id="available-missions" class="missions-grid">
+                                            <!-- Les missions disponibles seront ajoutées dynamiquement -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Modal des paramètres audio -->
+                <div id="audio-settings-modal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>🔊 Paramètres Audio</h3>
+                            <button id="close-audio-modal-btn" class="close-btn">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="audio-settings">
+                                <div class="audio-setting-item">
+                                    <label for="music-toggle">Musique :</label>
+                                    <button id="music-toggle" class="toggle-btn enabled">Activée</button>
+                                </div>
+                                <div class="audio-setting-item">
+                                    <label for="music-volume-slider">Volume Musique :</label>
+                                    <div class="volume-control">
+                                        <input type="range" id="music-volume-slider" min="0" max="100" value="15">
+                                        <span id="music-volume-display">15%</span>
+                                    </div>
+                                </div>
+                                <div class="audio-setting-item">
+                                    <label for="sound-toggle">Effets Sonores :</label>
+                                    <button id="sound-toggle" class="toggle-btn enabled">Activés</button>
+                                </div>
+                                <div class="audio-setting-item">
+                                    <label for="sound-volume-slider">Volume Sons :</label>
+                                    <div class="volume-control">
+                                        <input type="range" id="sound-volume-slider" min="0" max="100" value="80">
+                                        <span id="sound-volume-display">80%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="audio-settings-ok-btn" class="modal-btn primary">OK</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal de sélection d'aventuriers -->
+                <div id="adventurer-selection-modal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3 id="modal-mission-name">Sélection d'Aventuriers</h3>
+                            <button id="close-modal-btn" class="close-btn">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mission-requirements">
+                                <p id="modal-mission-description">Description de la mission</p>
+                                <div class="requirements-info">
+                                    <span>Aventuriers requis: </span>
+                                    <span id="modal-party-size">1-3</span>
+                                    <span class="difficulty-display">
+                                        Difficulté: <span id="modal-difficulty">⭐⭐⭐</span>
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="adventurer-selection">
+                                <h4>Aventuriers Disponibles:</h4>
+                                <div id="modal-adventurers-list" class="modal-adventurers-grid">
+                                    <!-- Liste des aventuriers disponibles -->
+                                </div>
+                            </div>
+                            
+                            <div class="selected-adventurers">
+                                <h4>Équipe Sélectionnée: <span id="selected-count">0</span></h4>
+                                <div id="selected-adventurers-list" class="selected-list">
+                                    <!-- Aventuriers sélectionnés -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="cancel-mission-btn" class="modal-btn secondary">Annuler</button>
+                            <button id="start-mission-btn" class="modal-btn primary">Lancer la Mission</button>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <!-- Données -->
+    <script src="json/events.js"></script>
+    
+    <!-- Enums -->
+    <script src="js/enums/ResourceTypes.js"></script>
+    
+    <!-- Classes -->
+    <script src="js/classes/Resource.js"></script>
+    <script src="js/classes/BuildingType.js"></script>
+    <script src="js/classes/Building.js"></script>
+    <script src="js/classes/Adventurer.js"></script>
+    <script src="js/classes/Achievement.js"></script>
+    <script src="js/classes/Season.js"></script>
+    <script src="js/classes/City.js"></script>
+    <script src="js/classes/Mission.js"></script>
+    <script src="js/classes/CityUpgrade.js"></script>
+    <script src="js/classes/Events.js"></script>
+    <script src="js/classes/GameManager.js"></script>
+    <script src="js/systems/BuildingManager.js"></script>
+    <script src="js/systems/AdventurerManager.js"></script>
+    <script src="js/systems/MissionManager.js"></script>
+    <script src="js/systems/CityUpgradeManager.js"></script>
+    <script src="js/systems/EventManager.js"></script>
+    <script src="js/systems/AchievementManager.js"></script>
+    <script src="js/systems/AudioManager.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
