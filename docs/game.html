@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poste de Travail - Département de Traitement des Demandes</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap');
+    
+    </style>
+</head>
+<body>
+    <div class="desktop">
+        <div class="status-bar">
+            <div>Employé: J. MARTIN - Niveau 3 | Département: Traitement Général des Demandes</div>
+            <div id="time">14:27:42 | Session: 47:32</div>
+        </div>
+        
+        <div class="queue-counter">
+            <div>FILES D'ATTENTE</div>
+            <div>En cours: <span id="current-queue">23</span></div>
+            <div>Urgent: <span id="urgent-queue">7</span></div>
+        </div>
+        
+        <div class="validation-cascade">
+            <div style="font-weight: bold; margin-bottom: 10px;">CASCADE DE VALIDATION</div>
+            <div id="cascade-list">
+                <div class="cascade-item processing">→ Vérification initiale</div>
+                <div class="cascade-item pending">→ Service Comptabilité</div>
+                <div class="cascade-item pending">→ Contrôle Légal</div>
+                <div class="cascade-item pending">→ Validation Hiérarchique</div>
+                <div class="cascade-item pending">→ Archivage</div>
+            </div>
+        </div>
+        
+        <div class="form-stack">
+            <div class="document active" id="current-form">
+                <div class="urgent-stamp">URGENT</div>
+                <div class="coffee-stain"></div>
+                <div class="document-header">DEMANDE DE CONGÉ MALADIE - FORMULAIRE 42-M</div>
+                
+                <div class="form-field">
+                    <span class="form-label">Nom du demandeur:</span>
+                    <input type="text" class="form-input" value="DUPONT, Marie" readonly>
+                </div>
+                
+                <div class="form-field">
+                    <span class="form-label">N° Sécurité Sociale:</span>
+                    <input type="text" class="form-input" value="1 67 04 75 123 456 78" readonly>
+                </div>
+                
+                <div class="form-field">
+                    <span class="form-label">Durée demandée:</span>
+                    <input type="text" class="form-input" value="3 jours" readonly>
+                </div>
+                
+                <div class="form-field">
+                    <span class="form-label">Motif médical:</span>
+                    <input type="text" class="form-input" value="Grippe saisonnière" readonly>
+                </div>
+                
+                <div style="margin: 20px 0; padding: 10px; background: #f9f9f9; border: 1px solid #ccc;">
+                    <div style="font-weight: bold; margin-bottom: 10px;">VÉRIFICATIONS OBLIGATOIRES:</div>
+                    <div class="checkbox-field">
+                        <div class="checkbox" onclick="toggleCheckbox(this)"></div>
+                        <span>Certificat médical joint (Article 15.2.a)</span>
+                    </div>
+                    <div class="checkbox-field">
+                        <div class="checkbox" onclick="toggleCheckbox(this)"></div>
+                        <span>Délai de prévenance respecté (48h min.)</span>
+                    </div>
+                    <div class="checkbox-field">
+                        <div class="checkbox" onclick="toggleCheckbox(this)"></div>
+                        <span>Période non conflictuelle avec congés équipe</span>
+                    </div>
+                    <div class="checkbox-field">
+                        <div class="checkbox" onclick="toggleCheckbox(this)"></div>
+                        <span>Quota annuel non dépassé</span>
+                    </div>
+                </div>
+                
+                <div style="margin: 15px 0; font-size: 10px; color: #666; font-style: italic;">
+                    <strong>Note:</strong> Cette demande concerne Marie Dupont, mère célibataire de 2 enfants. 
+                    Son salaire de 1200€/mois ne lui permet pas de consulter en médecine privée. 
+                    Elle travaille comme aide-soignante dans un EHPAD depuis 8 ans.
+                </div>
+                
+                <div class="stamp-area" onclick="stampDocument()" id="stamp-area">
+                    ZONE DE<br>TAMPON
+                </div>
+            </div>
+            
+            <!-- Formulaires suivants empilés -->
+            <div class="document">
+                <div class="document-header">DEMANDE D'AIDE AU LOGEMENT - FORMULAIRE 78-L</div>
+                <div style="padding: 20px;">Demandeur: BERNARD, Paul<br>Situation: Expulsion prévue dans 15 jours...</div>
+            </div>
+            
+            <div class="document">
+                <div class="document-header">RÉCLAMATION ADMINISTRATIVE - FORMULAIRE 156-R</div>
+                <div style="padding: 20px;">Objet: Erreur dans le calcul des prestations familiales...</div>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <button class="btn approve" onclick="processForm('approve')">
+                APPROUVER
+                <br><small>(Génère 5 validations)</small>
+            </button>
+            <button class="btn reject" onclick="processForm('reject')">
+                REJETER
+                <br><small>(Génère 3 justifications)</small>
+            </button>
+            <button class="btn" onclick="requestMoreInfo()">
+                DEMANDER COMPLÉMENT
+                <br><small>(Génère 8 formulaires)</small>
+            </button>
+            <button class="btn" onclick="transferFile()">
+                TRANSFÉRER DOSSIER
+                <br><small>(12 départements disponibles)</small>
+            </button>
+        </div>
+        
+        <div class="progress-bar">
+            Objectif quotidien: 45 dossiers | Traités: <span id="processed">0</span> | Temps moyen: 7min 32s | Erreurs: <span id="errors">0</span>
+        </div>
+        
+        <div class="notification" id="notification">
+            <!-- Les notifications apparaissent ici -->
+        </div>
+    </div>
+    
+    <script>
+        let processedCount = 0;
+        let errorCount = 0;
+        let currentQueue = 23;
+        let urgentQueue = 7;
+        let validationSteps = ['initial', 'comptabilite', 'legal', 'hierarchique', 'archivage'];
+        let currentStep = 0;
+        
+        const forms = [
+            {
+                title: "DEMANDE DE CONGÉ MALADIE - FORMULAIRE 42-M",
+                person: "DUPONT, Marie",
+                story: "Marie Dupont, mère célibataire de 2 enfants. Aide-soignante, 1200€/mois."
+            },
+            {
+                title: "DEMANDE D'AIDE AU LOGEMENT - FORMULAIRE 78-L", 
+                person: "BERNARD, Paul",
+                story: "Paul Bernard, 67 ans, retraité. Expulsion prévue dans 15 jours, pension de 450€/mois."
+            },
+            {
+                title: "RÉCLAMATION PRESTATIONS FAMILIALES - FORMULAIRE 156-R",
+                person: "MARTIN, Sophie", 
+                story: "Sophie Martin, 3 enfants, erreur de calcul lui fait perdre 200€/mois depuis 6 mois."
+            },
+            {
+                title: "DEMANDE D'INVALIDITÉ - FORMULAIRE 89-I",
+                person: "LEMOINE, Jean",
+                story: "Jean Lemoine, ouvrier, accident de travail. Ne peut plus travailler, famille à charge."
+            }
+        ];
+        
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('time').innerHTML = 
+                now.toLocaleTimeString() + ' | Session: ' + 
+                Math.floor(Math.random() * 60 + 40) + ':' + 
+                String(Math.floor(Math.random() * 60)).padStart(2, '0');
+        }
+        
+        function toggleCheckbox(checkbox) {
+            checkbox.classList.toggle('checked');
+            showNotification('Vérification mise à jour. Synchronisation avec 3 bases de données...');
+        }
+        
+        function stampDocument() {
+            const stampArea = document.getElementById('stamp-area');
+            stampArea.innerHTML = '<div class="stamp">VÉRIFIÉ<br>J.MARTIN</div>';
+            showNotification('Document tamponné. Génération automatique de 4 copies conformes...');
+        }
+        
+        function processForm(action) {
+            processedCount++;
+            document.getElementById('processed').textContent = processedCount;
+            
+            if (action === 'approve') {
+                showNotification('DOSSIER APPROUVÉ. Génération de 5 formulaires de validation en cours...');
+                updateCascade();
+            } else if (action === 'reject') {
+                showNotification('DOSSIER REJETÉ. Génération de 3 formulaires de justification + notification automatique au demandeur...');
+                errorCount++;
+                document.getElementById('errors').textContent = errorCount;
+            }
+            
+            setTimeout(loadNextForm, 2000);
+        }
+        
+        function requestMoreInfo() {
+            showNotification('COMPLÉMENT D\'INFORMATION REQUIS. Génération de 8 formulaires différents + lettre recommandée...');
+            currentQueue += 3;
+            document.getElementById('current-queue').textContent = currentQueue;
+        }
+        
+        function transferFile() {
+            showNotification('TRANSFERT EN COURS vers le Département de Gestion des Transferts de Dossiers (qui va retransférer vers 3 autres départements)...');
+            currentQueue--;
+            urgentQueue++;
+            document.getElementById('current-queue').textContent = currentQueue;
+            document.getElementById('urgent-queue').textContent = urgentQueue;
+        }
+        
+        function loadNextForm() {
+            const randomForm = forms[Math.floor(Math.random() * forms.length)];
+            const currentForm = document.getElementById('current-form');
+            
+            // Animation de sortie
+            currentForm.style.transform = 'translateX(-800px) rotate(-15deg)';
+            currentForm.style.opacity = '0';
+            
+            setTimeout(() => {
+                // Charger nouveau formulaire
+                currentForm.querySelector('.document-header').textContent = randomForm.title;
+                currentForm.querySelector('.form-input').value = randomForm.person;
+                
+                // Reset checkboxes et tampon
+                const checkboxes = currentForm.querySelectorAll('.checkbox');
+                checkboxes.forEach(cb => cb.classList.remove('checked'));
+                document.getElementById('stamp-area').innerHTML = 'ZONE DE<br>TAMPON';
+                
+                // Animation d'entrée
+                currentForm.style.transform = 'translateX(0) rotate(0deg)';
+                currentForm.style.opacity = '1';
+                
+                // Mise à jour des compteurs
+                currentQueue = Math.max(1, currentQueue - 1 + Math.floor(Math.random() * 3));
+                urgentQueue = Math.max(0, urgentQueue + Math.floor(Math.random() * 2) - 1);
+                document.getElementById('current-queue').textContent = currentQueue;
+                document.getElementById('urgent-queue').textContent = urgentQueue;
+                
+                // Reset cascade
+                resetCascade();
+            }, 300);
+        }
+        
+        function updateCascade() {
+            const cascadeItems = document.querySelectorAll('.cascade-item');
+            currentStep++;
+            
+            if (currentStep < cascadeItems.length) {
+                cascadeItems[currentStep - 1].classList.remove('processing');
+                cascadeItems[currentStep - 1].classList.add('approved');
+                
+                if (currentStep < cascadeItems.length) {
+                    cascadeItems[currentStep].classList.add('processing');
+                }
+            }
+        }
+        
+        function resetCascade() {
+            const cascadeItems = document.querySelectorAll('.cascade-item');
+            cascadeItems.forEach((item, index) => {
+                item.classList.remove('processing', 'approved');
+                if (index === 0) {
+                    item.classList.add('processing');
+                } else {
+                    item.classList.add('pending');
+                }
+            });
+            currentStep = 0;
+        }
+        
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.innerHTML = `<strong>SYSTÈME:</strong> ${message}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+        
+        // Notifications automatiques aléatoires
+        function randomSystemNotifications() {
+            const messages = [
+                "3 nouveaux formulaires ajoutés à votre file d'attente.",
+                "Rappel: Pause déjeuner limitée à 23 minutes (Règlement 47-C).",
+                "Le Département des Validations Hiérarchiques est temporairement fermé.",
+                "Mise à jour système: 47 nouveaux champs obligatoires ajoutés.",
+                "Attention: Le formulaire 89-X remplace désormais le 89-W depuis ce matin.",
+                "Base de données synchronisée. 156 incohérences détectées.",
+                "Formation obligatoire prévue demain: 'Nouvelles procédures de tamponnage'."
+            ];
+            
+            setInterval(() => {
+                if (Math.random() < 0.3) {
+                    const message = messages[Math.floor(Math.random() * messages.length)];
+                    showNotification(message);
+                }
+            }, 8000);
+        }
+        
+        // Initialisation
+        updateTime();
+        setInterval(updateTime, 1000);
+        randomSystemNotifications();
+        
+        // Effets spéciaux aléatoires
+        setInterval(() => {
+            if (Math.random() < 0.1) {
+                document.body.style.filter = 'contrast(1.02)';
+                setTimeout(() => {
+                    document.body.style.filter = 'contrast(1)';
+                }, 100);
+            }
+        }, 3000);
+        
+        // Message d'accueil
+        setTimeout(() => {
+            showNotification("Bienvenue dans votre poste de travail. 23 dossiers vous attendent. Bonne journée productive !");
+        }, 1000);
+    </script>
+</body>
+</html>

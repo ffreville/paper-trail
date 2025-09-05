@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Système de Gestion Administrative Intégrée</title>
+    <link rel="stylesheet" href="css/game.css">
+    <link rel="stylesheet" href="css/mainMenu.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap');
+    </style>
+</head>
+<body>
+    <div id="main-menu" class="document-container">
+        <div class="paperclip"></div>
+        <div class="reference-number">
+            Réf: SGAI-2025-MENU-001<br>
+            Date: 26/08/2025
+        </div>
+        
+        <div class="stamp">
+            ACCÈS<br>
+            AUTORISÉ
+        </div>
+        
+        <div class="header">
+            RÉPUBLIQUE ADMINISTRATIVE - MINISTÈRE DE LA GESTION INTÉGRÉE
+        </div>
+        
+        <div class="form-content">
+            <div class="title-section">
+                <div class="main-title">Système de Gestion Administrative Intégrée</div>
+                <div class="subtitle">Plateforme Unifiée de Traitement des Demandes Citoyennes</div>
+                <div class="version">Version 12.7.3b - Build 2025.08.26</div>
+            </div>
+            
+            <div class="warning-text">
+                <strong>ATTENTION:</strong> L'accès à ce système engage votre responsabilité administrative. 
+                Toute action effectuée sera tracée et archivée conformément aux articles 42.3.7 à 42.3.12 
+                du Code de Procédure Administrative Généralisée.
+            </div>
+            
+            <div class="menu-section">
+                <div class="section-title">□ Sélection du Module d'Activité</div>
+                
+                <div id="new-game" class="menu-option">
+                    <div><span class="option-code">[A]</span> NOUVELLE AFFECTATION</div>
+                    <div class="option-description">Initialiser un nouveau profil d'employé administratif</div>
+                </div>
+                
+                <div id="load-game" class="menu-option">
+                    <div><span class="option-code">[B]</span> REPRISE DE POSTE</div>
+                    <div class="option-description">Récupérer une session de travail en cours</div>
+                </div>
+                
+                <div class="menu-option" onclick="viewArchives()">
+                    <div><span class="option-code">[C]</span> CONSULTATION D'ARCHIVES</div>
+                    <div class="option-description">Accès aux dossiers traités précédemment</div>
+                </div>
+                
+                <div class="menu-option" onclick="showSettings()">
+                    <div><span class="option-code">[D]</span> PARAMÈTRES SYSTÈME</div>
+                    <div class="option-description">Configuration des préférences utilisateur</div>
+                </div>
+                
+                <div class="menu-option" onclick="showHelp()">
+                    <div><span class="option-code">[E]</span> MANUEL DE PROCÉDURES</div>
+                    <div class="option-description">Guide d'utilisation du système administratif</div>
+                </div>
+            </div>
+            
+            <div class="menu-section">
+                <div class="section-title">□ Informations de Session</div>
+                <div style="font-size: 12px; color: #666; line-height: 1.5;">
+                    <div><span class="checkbox checked"></span> Connexion sécurisée établie</div>
+                    <div><span class="checkbox checked"></span> Modules système chargés</div>
+                    <div><span class="checkbox checked"></span> Base de données synchronisée</div>
+                    <div><span class="checkbox"></span> Formation obligatoire en cours de validité</div>
+                </div>
+            </div>
+            
+            <div class="warning-text">
+                <strong>RAPPEL RÈGLEMENTAIRE:</strong> En cas de doute sur une procédure, 
+                référez-vous impérativement au Manuel de Procédures (Section E) avant toute action. 
+                Les erreurs de traitement peuvent entraîner des cascades de validation pouvant 
+                affecter jusqu'à 47 départements différents.
+            </div>
+        </div>
+        
+        <div class="footer">
+            Système développé par le Bureau Central de Développement des Systèmes de Bureau Centraux<br>
+            En cas de dysfonctionnement, remplir le formulaire 247-B disponible au guichet 12 du bâtiment annexe C<br>
+            <strong>© 2025 - Tous droits administrés</strong>
+        </div>
+    </div>
+    <div id="game" class="desktop" style="display: none;">
+        <div class="status-bar">
+            <div>Employé: J. MARTIN - Niveau 3 | Département: Traitement Général des Demandes</div>
+            <div id="time">14:27:42 | Session: 47:32</div>
+        </div>
+        
+        <div class="queue-counter">
+            <div>FILES D'ATTENTE</div>
+            <div>En cours: <span id="current-queue">23</span></div>
+            <div>Urgent: <span id="urgent-queue">7</span></div>
+        </div>
+        
+        <div class="validation-cascade" style="display:none;">
+            <div style="font-weight: bold; margin-bottom: 10px;">CASCADE DE VALIDATION</div>
+            <div id="cascade-list">
+                <div class="cascade-item processing">→ Vérification initiale</div>
+                <div class="cascade-item pending">→ Service Comptabilité</div>
+                <div class="cascade-item pending">→ Contrôle Légal</div>
+                <div class="cascade-item pending">→ Validation Hiérarchique</div>
+                <div class="cascade-item pending">→ Archivage</div>
+            </div>
+        </div>
+        
+        <div class="form-stack">
+            <div class="document active" id="current-form">
+                <div class="urgent-stamp">URGENT</div>
+                <div class="coffee-stain"></div>
+                <div class="document-header">DEMANDE DE CONGÉ MALADIE - FORMULAIRE 42-M</div>
+                
+                <div class="form-field">
+                    <span class="form-label">Nom du demandeur:</span>
+                    <input type="text" class="form-input" value="DUPONT, Marie" readonly>
+                </div>
+                
+                <div class="form-field">
+                    <span class="form-label">N° Sécurité Sociale:</span>
+                    <input type="text" class="form-input" value="1 67 04 75 123 456 78" readonly>
+                </div>
+                
+                <div class="form-field">
+                    <span class="form-label">Durée demandée:</span>
+                    <input type="text" class="form-input" value="3 jours" readonly>
+                </div>
+                
+                <div class="form-field">
+                    <span class="form-label">Motif médical:</span>
+                    <input type="text" class="form-input" value="Grippe saisonnière" readonly>
+                </div>
+                
+                <div style="margin: 20px 0; padding: 10px; background: #f9f9f9; border: 1px solid #ccc;">
+                    <div style="font-weight: bold; margin-bottom: 10px;">VÉRIFICATIONS OBLIGATOIRES:</div>
+                    <div class="checkbox-field">
+                        <div class="checkbox" onclick="toggleCheckbox(this)"></div>
+                        <span>Certificat médical joint (Article 15.2.a)</span>
+                    </div>
+                    <div class="checkbox-field">
+                        <div class="checkbox" onclick="toggleCheckbox(this)"></div>
+                        <span>Délai de prévenance respecté (48h min.)</span>
+                    </div>
+                    <div class="checkbox-field">
+                        <div class="checkbox" onclick="toggleCheckbox(this)"></div>
+                        <span>Période non conflictuelle avec congés équipe</span>
+                    </div>
+                    <div class="checkbox-field">
+                        <div class="checkbox" onclick="toggleCheckbox(this)"></div>
+                        <span>Quota annuel non dépassé</span>
+                    </div>
+                </div>
+                
+                <div style="margin: 15px 0; font-size: 10px; color: #666; font-style: italic;">
+                    <strong>Note:</strong> Cette demande concerne Marie Dupont, mère célibataire de 2 enfants. 
+                    Son salaire de 1200€/mois ne lui permet pas de consulter en médecine privée. 
+                    Elle travaille comme aide-soignante dans un EHPAD depuis 8 ans.
+                </div>
+                
+                <div class="stamp-area" onclick="stampDocument()" id="stamp-area">
+                    ZONE DE<br>TAMPON
+                </div>
+            </div>
+            
+            <!-- Formulaires suivants empilés -->
+            <div class="document">
+                <div class="document-header">DEMANDE D'AIDE AU LOGEMENT - FORMULAIRE 78-L</div>
+                <div style="padding: 20px;">Demandeur: BERNARD, Paul<br>Situation: Expulsion prévue dans 15 jours...</div>
+            </div>
+            
+            <div class="document">
+                <div class="document-header">RÉCLAMATION ADMINISTRATIVE - FORMULAIRE 156-R</div>
+                <div style="padding: 20px;">Objet: Erreur dans le calcul des prestations familiales...</div>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <button class="btn approve" onclick="processForm('approve')">
+                APPROUVER
+                <br><small>(Génère 5 validations)</small>
+            </button>
+            <button class="btn reject" onclick="processForm('reject')">
+                REJETER
+                <br><small>(Génère 3 justifications)</small>
+            </button>
+            <button class="btn" onclick="requestMoreInfo()">
+                DEMANDER COMPLÉMENT
+                <br><small>(Génère 8 formulaires)</small>
+            </button>
+            <button class="btn" onclick="transferFile()">
+                TRANSFÉRER DOSSIER
+                <br><small>(12 départements disponibles)</small>
+            </button>
+        </div>
+        
+        <div class="progress-bar">
+            Objectif quotidien: 45 dossiers | Traités: <span id="processed">0</span> | Temps moyen: 7min 32s | Erreurs: <span id="errors">0</span>
+        </div>
+        
+        <div class="notification" id="notification">
+            <!-- Les notifications apparaissent ici -->
+        </div>
+    </div>
+
+    <script type="text/javascript" src="js/utils.js"></script>
+    <script type="text/javascript" src="js/managers/FormManager.js"></script>
+    <script type="text/javascript" src="js/managers/GameManager.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>
+</body>
+</html>

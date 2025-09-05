@@ -1,0 +1,296 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Courier Prime', monospace;
+    background: #e8e8e0;
+    background-image: 
+        radial-gradient(circle at 20% 50%, rgba(0,0,0,0.02) 1px, transparent 1px);
+    min-height: 100vh;
+    color: #2a2a2a;
+    overflow-x: hidden;
+}
+
+.desktop {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    background: linear-gradient(45deg, #d4d4aa 0%, #e8e8e0 100%);
+}
+
+.status-bar {
+    background: #333;
+    color: white;
+    padding: 5px 15px;
+    font-size: 12px;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 2px solid #000;
+}
+
+.form-stack {
+    position: absolute;
+    top: 50px;
+    left: 50px;
+    width: 600px;
+    height: 700px;
+}
+
+.document {
+    position: absolute;
+    background: white;
+    border: 2px solid #333;
+    box-shadow: 3px 3px 8px rgba(0,0,0,0.3);
+    padding: 20px;
+    font-size: 12px;
+    transition: all 0.3s ease;
+}
+
+.document.active {
+    z-index: 100;
+    transform: translateZ(0);
+}
+
+.document:nth-child(2) { transform: rotate(2deg) translate(5px, 5px); z-index: 2; }
+.document:nth-child(3) { transform: rotate(-1deg) translate(10px, 10px); z-index: 1; }
+.document:nth-child(4) { transform: rotate(1deg) translate(15px, 15px); z-index: 0; }
+
+.document-header {
+    background: #333;
+    color: white;
+    padding: 8px 12px;
+    margin: -20px -20px 15px -20px;
+    font-weight: bold;
+    font-size: 11px;
+    letter-spacing: 1px;
+}
+
+.form-field {
+    margin: 15px 0;
+    display: flex;
+    align-items: center;
+    min-height: 25px;
+}
+
+.form-label {
+    width: 200px;
+    font-weight: bold;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.form-input {
+    flex: 1;
+    border: none;
+    border-bottom: 1px solid #333;
+    background: transparent;
+    font-family: 'Courier Prime', monospace;
+    font-size: 12px;
+    padding: 2px 0;
+}
+
+.checkbox-field {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.checkbox {
+    width: 15px;
+    height: 15px;
+    border: 2px solid #333;
+    margin-right: 10px;
+    cursor: pointer;
+    position: relative;
+    background: white;
+}
+
+.checkbox.checked::after {
+    content: '✗';
+    position: absolute;
+    left: 1px;
+    top: -2px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.stamp-area {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 80px;
+    height: 80px;
+    border: 3px dashed #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: #999;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.stamp-area:hover {
+    border-color: #333;
+    color: #333;
+}
+
+.stamp {
+    width: 70px;
+    height: 70px;
+    border: 3px solid #cc0000;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #cc0000;
+    font-size: 10px;
+    text-align: center;
+    background: rgba(255,255,255,0.9);
+    transform: rotate(15deg);
+    animation: stampAnimation 0.5s ease-out;
+}
+
+@keyframes stampAnimation {
+    0% { transform: rotate(15deg) scale(0) translate(100px, -100px); opacity: 0; }
+    50% { transform: rotate(15deg) scale(1.2) translate(0, 0); opacity: 1; }
+    100% { transform: rotate(15deg) scale(1) translate(0, 0); opacity: 1; }
+}
+
+.action-buttons {
+    position: absolute;
+    bottom: 50px;
+    right: 50px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.btn {
+    padding: 12px 20px;
+    background: white;
+    border: 2px solid #333;
+    font-family: 'Courier Prime', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 150px;
+}
+
+.btn:hover {
+    background: #f0f0f0;
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 #333;
+}
+
+.btn:active {
+    transform: translate(0, 0);
+    box-shadow: 2px 2px 0 #333;
+}
+
+.btn.approve { background: #d4edda; border-color: #155724; color: #155724; }
+.btn.reject { background: #f8d7da; border-color: #721c24; color: #721c24; }
+
+.notification {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    background: #fff3cd;
+    border: 2px solid #856404;
+    color: #856404;
+    padding: 15px;
+    border-radius: 0;
+    font-size: 11px;
+    max-width: 300px;
+    z-index: 200;
+    transform: translateX(320px);
+    transition: transform 0.3s ease;
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+.queue-counter {
+    position: fixed;
+    top: 50px;
+    right: 20px;
+    background: white;
+    border: 2px solid #333;
+    padding: 10px 15px;
+    font-weight: bold;
+    z-index: 150;
+}
+
+.progress-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 30px;
+    background: #333;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    z-index: 150;
+}
+
+.validation-cascade {
+    position: fixed;
+    left: 20px;
+    top: 100px;
+    background: white;
+    border: 2px solid #333;
+    padding: 15px;
+    max-width: 250px;
+    font-size: 10px;
+    z-index: 150;
+}
+
+.cascade-item {
+    padding: 3px 0;
+    border-bottom: 1px dotted #ccc;
+}
+
+.cascade-item.pending { color: #856404; }
+.cascade-item.approved { color: #155724; }
+.cascade-item.processing { color: #004085; font-weight: bold; }
+
+.typewriter {
+    animation: typewriter 2s steps(40) 1s both;
+}
+
+@keyframes typewriter {
+    from { width: 0; }
+    to { width: 100%; }
+}
+
+.coffee-stain {
+    position: absolute;
+    top: 100px;
+    right: 50px;
+    width: 60px;
+    height: 60px;
+    background: radial-gradient(ellipse at center, rgba(101,67,33,0.3) 0%, rgba(101,67,33,0.1) 50%, transparent 100%);
+    border-radius: 50%;
+    transform: rotate(-15deg);
+}
+
+.urgent-stamp {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: #cc0000;
+    color: white;
+    padding: 5px 10px;
+    font-weight: bold;
+    font-size: 11px;
+    transform: rotate(15deg);
+    border: 2px solid #990000;
+}
