@@ -1,9 +1,10 @@
 class ScenarioStep{
-    constructor(name, description, form, isOptional, isCompleted){
+    constructor(name, description, forms, isOptional, isCompleted, chanceToAppear){
         this.name = name;
         this.description = description;
-        this.form = form;
+        this.forms = forms;
         this.isOptional = isOptional;
         this.isCompleted = isCompleted;
+        this.chanceToAppear = chanceToAppear;
     }
 }

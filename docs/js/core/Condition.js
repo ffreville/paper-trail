@@ -1,8 +1,8 @@
 const ConditionType = {
-    Always,
-    FieldEquals,
-    FieldGreaterThan,
-    FieldLessThan
+    Always : "Always",
+    FieldEquals : "FieldEquals",
+    FieldGreaterThan : "FieldGreaterThan",
+    FieldLessThan : "FieldLessThan"
 }
 
 class Condition{

@@ -1,6 +1,7 @@
 class PaperTrail {
     constructor() {
         this.gameManager = new GameManager();
+        this.formManager = new FormManager();
     }
 }
 
@@ -10,6 +11,7 @@ let app;
 document.addEventListener('DOMContentLoaded', () => {
     app = new PaperTrail();
     app.gameManager.initialize();
+    app.formManager.initForms();
     window.app = app;
 });
 

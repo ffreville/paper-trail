@@ -1,0 +1,11 @@
+Scénarios: liste des niveaux
+    - Jour de travail classique
+    - Jour férié
+    - Jour des allocations
+
+Etapes de scénarios : décomposition d'une journée ?
+    - Matin
+    - Midi (heure sup), optionnel
+    - Aprem
+    - Soirée (heure sup, optionnel)
+    - Nuit (astreinte) : à voir
