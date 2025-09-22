@@ -11,8 +11,12 @@ let app;
 document.addEventListener('DOMContentLoaded', () => {
     app = new PaperTrail();
     app.gameManager.initialize();
-    app.formManager.initForms();
+    app.formManager.initialize();
     window.app = app;
+
+    window.addEventListener("game-started", (event) => {
+        app.formManager.loadForm();
+    });
 });
 
 // Gestion des erreurs globales

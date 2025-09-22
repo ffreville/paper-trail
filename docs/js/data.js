@@ -6,15 +6,30 @@ data.forms = {
         code: "F-001",
         department: "Informatique",
         fields : [{
-            fieldName : "object",
+            fieldName : "object-field",
             label: "Objet de la demande",
             isRequired : true,
             isReadOnly: false
         },{
-            fieldName : "name",
+            fieldName : "name-field",
             label: "Nom du demandeur",
             isRequired : true,
             isReadOnly: false
+        },{
+            fieldName : "age-field",
+            label: "Age",
+            isRequired : true,
+            isReadOnly: false
+        }],
+        cascadeRules : [{
+            name: "majeur",
+            condition: {
+                conditionType: ConditionType.FieldGreaterThan,
+                fieldName: "age-field",
+                expectedValue : 18 
+            },
+            triggerMessage: "Vous êtes majeur, vous avez un formulaire en plus",
+            formsToTrigger : ["F-003"]
         }]
     },
     "F-002" : {
@@ -23,12 +38,29 @@ data.forms = {
         code: "F-002",
         department: "Informatique",
         fields : [{
-            fieldName : "object",
+            fieldName : "object-field",
             label: "Objet de la demande",
             isRequired : true,
             isReadOnly: false
         },{
-            fieldName : "name",
+            fieldName : "name-field",
+            label: "Nom du demandeur",
+            isRequired : true,
+            isReadOnly: false
+        }]
+    },
+        "F-003" : {
+        title: "Formulaire du majeur",
+        description: "On sait pas quoi mettre dedans non plus",
+        code: "F-003",
+        department: "Informatique",
+        fields : [{
+            fieldName : "object-field",
+            label: "Objet de la demande",
+            isRequired : true,
+            isReadOnly: false
+        },{
+            fieldName : "name-field",
             label: "Nom du demandeur",
             isRequired : true,
             isReadOnly: false

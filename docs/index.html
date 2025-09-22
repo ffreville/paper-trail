@@ -174,19 +174,19 @@
             </div>
             
             <!-- Formulaires suivants empilés -->
-            <div class="document">
+            <div class="document" style="display:none;">
                 <div class="document-header">DEMANDE D'AIDE AU LOGEMENT - FORMULAIRE 78-L</div>
                 <div style="padding: 20px;">Demandeur: BERNARD, Paul<br>Situation: Expulsion prévue dans 15 jours...</div>
             </div>
             
-            <div class="document">
+            <div class="document"  style="display:none;">
                 <div class="document-header">RÉCLAMATION ADMINISTRATIVE - FORMULAIRE 156-R</div>
                 <div style="padding: 20px;">Objet: Erreur dans le calcul des prestations familiales...</div>
             </div>
         </div>
         
         <div class="action-buttons">
-            <button class="btn approve" onclick="processForm('approve')">
+            <button id="approve" class="btn approve">
                 APPROUVER
                 <br><small>(Génère 5 validations)</small>
             </button>
@@ -212,10 +212,12 @@
             <!-- Les notifications apparaissent ici -->
         </div>
     </div>
+    <script type="text/javascript" src="js/core/Condition.js"></script>
+
     <script type="text/javascript" src="js/data.js"></script>
     <script type="text/javascript" src="js/utils.js"></script>
 
-    <script type="text/javascript" src="js/core/Condition.js"></script>
+
     <script type="text/javascript" src="js/core/CascadeRule.js"></script>
     <script type="text/javascript" src="js/core/Form.js"></script>
     <script type="text/javascript" src="js/core/ScenarioStep.js"></script>
